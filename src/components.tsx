@@ -1,33 +1,35 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { Zap, Leaf, Coins, FlaskConical, Globe2, X, Landmark, Factory, Route, Building2, Sparkles } from 'lucide-react';
-import { BASE_CATALOG, CATEGORIES, LABELS, SLOTS } from './game/catalog';
+import { CATEGORIES, LABELS } from './game/catalog';
 import type { Category, Symbol, Tile } from './game/types';
+import { resolveArtwork, type Artwork } from './artwork';
 
 export const ICONS = { energy: Zap, ecology: Leaf, capital: Coins, research: FlaskConical, prosperity: Globe2 };
 export const CATEGORY_ICONS = { power: Factory, supply: Zap, transport: Route, infrastructure: Building2, special: Sparkles };
 export function SymbolIcon({ name, size = 16 }: { name: Symbol; size?: number }) {
   const Icon = ICONS[name]; return <Icon size={size} aria-hidden="true" />;
 }
-function artworkReference(tile: Tile) {
-  return BASE_CATALOG.find(t => t.image === tile.image) ?? SLOTS.find(s => s.initial?.image === tile.image)?.initial;
-}
 export function usesSymbolOverlay(tile: Tile) {
-  const reference = artworkReference(tile);
-  const changed = reference && (['energy', 'ecology', 'capital', 'research', 'prosperity', 'level', 'category', 'track', 'effect', 'amount'] as const).some(key => reference[key] !== tile[key]);
-  return tile.symbolsOnImage ?? (!reference || !!changed);
+  return tile.symbolsOnImage ?? true;
+}
+function AtlasArt({ artwork }: { artwork: Artwork }) {
+  const [x, y, width, height] = artwork.frame;
+  const edge = Math.max(width, height);
+  return <span className="atlas-frame" style={{ width: `${width / edge * 100}%`, height: `${height / edge * 100}%` }}>
+    <img src={artwork.src} alt="" loading="lazy" decoding="async" style={{ width: `${artwork.columns / width * 100}%`, height: `${artwork.rows / height * 100}%`, left: `${-x / width * 100}%`, top: `${-y / height * 100}%` }} />
+  </span>;
 }
 export function TileArt({ tile, className = '' }: { tile: Tile; className?: string }) {
   const Icon = CATEGORY_ICONS[tile.category];
-  const reference = artworkReference(tile);
+  const artwork = resolveArtwork(tile.image);
   const symbols = usesSymbolOverlay(tile);
-  if (reference && !symbols && tile.symbolsOnImage === undefined) return <img className={`tile-art ${className}`} src={tile.image} alt="" loading="lazy" />;
   const badges = (keys: Symbol[]) => keys.filter(key => Number.isFinite(tile[key]) && tile[key] !== 0).map(key => (
     <span key={key} className={`art-symbol symbol-${key} ${tile[key] < 0 ? 'negative' : ''}`} data-symbol={key} title={`${LABELS[key]} : ${tile[key]}`}>
       <SymbolIcon name={key} size={15} /><b>{tile[key] > 0 && (key === 'energy' || key === 'ecology') ? '+' : ''}{tile[key]}</b>
     </span>
   ));
-  return <div className={`tile-art composed-tile cat-${tile.category} ${className}`}>
-    {tile.image ? <img className={`composed-scene ${reference ? 'reference-scene' : ''}`} src={reference ? tile.image.replace('/assets/', '/assets/art-') : tile.image} alt="" loading="lazy" /> : <Icon className="composed-placeholder" size={48} strokeWidth={1} />}
+  return <div className={`tile-art composed-tile ${artwork ? 'illustrated-tile' : ''} cat-${tile.category} ${className}`}>
+    {artwork ? <AtlasArt artwork={artwork} /> : tile.image ? <img className="composed-scene" src={tile.image} alt="" loading="lazy" /> : <Icon className="composed-placeholder" size={48} strokeWidth={1} />}
     {symbols && <>
       <span className="art-symbols art-symbols-top">{badges(['energy', 'ecology'])}</span>
       <span className="art-symbols art-symbols-bottom">{tile.category === 'special' ? <span className={`art-symbol symbol-${tile.effect === 'points' ? 'prosperity' : 'ecology'}`} data-symbol={tile.effect === 'points' ? 'prosperity' : 'ecology'}><SymbolIcon name={tile.effect === 'points' ? 'prosperity' : 'ecology'} size={15} /><b>{tile.effect === 'points' ? '+' : '-'}{tile.amount}</b></span> : badges(['capital', 'research', 'prosperity'])}</span>

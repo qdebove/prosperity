@@ -1,4 +1,5 @@
 import type { Category, Slot, Stats, Symbol, Tile, Track } from './types';
+import { artworkImageFor, normalizeArtworkImage, resolveArtwork } from '../artwork';
 
 export const LABELS: Record<Symbol, string> = { energy: 'Énergie', ecology: 'Écologie', capital: 'Capital', research: 'Recherche', prosperity: 'Prospérité' };
 export const CATEGORIES: Record<Category, string> = { power: 'Centrale', supply: 'Distribution', transport: 'Transport', infrastructure: 'Infrastructure', special: 'Projet spécial' };
@@ -89,14 +90,14 @@ const dated: Row[][] = [
 
 function makeTile(row: Row, id: string, decade: number, tally: Symbol): Tile {
   const [name, category, track, level, values, effect = 'none', amount = 0] = row;
-  return { id, name, category, track, level, ...values, decade, tally, image: `/assets/${id}.jpg`, effect, amount };
+  return { id, name, category, track, level, ...values, decade, tally, image: artworkImageFor(id), effect, amount };
 }
 export const BASE_CATALOG: Tile[] = [
   ...initial.map((row, i) => makeTile(row, `initial-${i}`, 0, 'prosperity')),
   ...dated.flatMap((rows, decade) => rows.map((row, col) => makeTile(row, `${DECADES[decade]}-${col}`, DECADES[decade], (['energy', 'ecology', 'capital', 'research', 'prosperity', 'prosperity'] as Symbol[])[col]))),
 ];
 
-const starting = (id: string, name: string, category: Category, values: Stats): Tile => ({ id, name, category, ...values, track: 'energy', level: 1, decade: 0, tally: 'energy', image: `/assets/${id}.jpg`, effect: 'none', amount: 0 });
+const starting = (id: string, name: string, category: Category, values: Stats): Tile => ({ id, name, category, ...values, track: 'energy', level: 1, decade: 0, tally: 'energy', image: artworkImageFor(id), effect: 'none', amount: 0 });
 export const SLOTS: Slot[] = [
   { id: 'a1', category: 'power', row: 1, col: 1, initial: starting('start-coal', 'Centrale à charbon', 'power', stats(2, -1)) },
   { id: 'a2', category: 'infrastructure', row: 1, col: 2 },
@@ -128,10 +129,9 @@ export function validateCatalog(value: unknown): Tile[] {
     if (Math.abs(t.energy) > 9 || Math.abs(t.ecology) > 9 || [t.capital, t.research, t.prosperity].some(v => v < 0 || v > 6)) throw new Error('Les valeurs de la tuile dépassent les limites.');
     if (!['none', 'points', 'cleanup'].includes(t.effect) || t.amount < 0 || t.amount > 9 || (t.category === 'special' ? t.effect === 'none' || t.amount < 1 : t.effect !== 'none' || t.amount !== 0)) throw new Error('Effet spécial invalide.');
     if (t.category === 'special' && [t.energy, t.ecology, t.capital, t.research, t.prosperity].some(value => value !== 0)) throw new Error('Un projet spécial ne peut pas avoir d’effets permanents.');
-    if (typeof t.image !== 'string' || t.image.length > 2800000 || !(/^\/assets\/[a-zA-Z0-9_-]+\.jpg$/.test(t.image) || /^data:image\/(png|jpeg|webp);base64,[a-zA-Z0-9+/=]+$/.test(t.image) || t.image === '')) throw new Error('Illustration invalide. Utilisez un fichier PNG, JPEG ou WebP.');
+    if (typeof t.image !== 'string' || t.image.length > 2800000 || !(resolveArtwork(t.image) || /^data:image\/(png|jpeg|webp);base64,[a-zA-Z0-9+/=]+$/.test(t.image) || t.image === '')) throw new Error('Illustration invalide. Utilisez un fichier PNG, JPEG ou WebP.');
     if (t.symbolsOnImage !== undefined && typeof t.symbolsOnImage !== 'boolean') throw new Error('Option de symboles invalide.');
-    if (t.image.startsWith('/assets/') && !BASE_CATALOG.some(base => base.image === t.image) && !SLOTS.some(slot => slot.initial?.image === t.image)) throw new Error('Illustration absente de la bibliothèque.');
-    return { id: t.id, name: t.name.trim(), category: t.category, track: t.track, level: t.level, decade: t.decade, tally: t.tally, image: t.image, ...(t.symbolsOnImage === undefined ? {} : { symbolsOnImage: t.symbolsOnImage }), effect: t.effect, amount: t.amount, energy: t.energy, ecology: t.ecology, capital: t.capital, research: t.research, prosperity: t.prosperity };
+    return { id: t.id, name: t.name.trim(), category: t.category, track: t.track, level: t.level, decade: t.decade, tally: t.tally, image: normalizeArtworkImage(t.image), ...(t.symbolsOnImage === undefined ? {} : { symbolsOnImage: t.symbolsOnImage }), effect: t.effect, amount: t.amount, energy: t.energy, ecology: t.ecology, capital: t.capital, research: t.research, prosperity: t.prosperity };
   });
   return result;
 }

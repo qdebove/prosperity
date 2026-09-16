@@ -1,6 +1,6 @@
 # Prosperity, version web solo
 
-Adaptation française jouable de Prosperity (Reiner Knizia et Sebastian Bleasdale), réalisée à partir de `bb-prosperity-rulebook.pdf`. Les illustrations des 60 tuiles et les bâtiments du plateau argent sont extraits du document fourni.
+Adaptation française jouable de Prosperity (Reiner Knizia et Sebastian Bleasdale), réalisée à partir de `bb-prosperity-rulebook.pdf`. Les règles proviennent du document fourni ; les 60 technologies et les 6 bâtiments de départ disposent désormais d'illustrations isométriques originales générées pour cette adaptation.
 
 ## Démarrer
 
@@ -36,7 +36,7 @@ Le livret n'inclut pas de mode solo. Cette adaptation est un défi de score où 
 
 Modification des valeurs et caractéristiques, création, duplication, restauration des originales et suppression des créations. Illustrations du catalogue ou import PNG/JPEG/WebP (2 Mo maximum). Import/export JSON avec validation des valeurs, des identifiants et des images.
 
-Les cinq symboles de ressources sont composés directement sur l'illustration selon les valeurs choisies, y compris les signes négatifs. Leur affichage peut être activé ou masqué. Les tuiles originales modifiées utilisent leur illustration seule, pour ne pas conserver d'anciens symboles contradictoires. L'aperçu, le marché et le plateau partagent ce même rendu ; l'export JSON conserve l'image, les valeurs et ce réglage.
+Les cinq symboles de ressources sont composés directement sur l'illustration selon les valeurs choisies, y compris les signes négatifs. Leur affichage peut être activé ou masqué. Aucune valeur n'est imprimée dans les nouvelles images : modifier une tuile met donc toujours ses symboles à jour. L'aperçu, le marché et le plateau partagent ce même rendu ; l'export JSON conserve l'image, les valeurs et ce réglage.
 
 Cocher « Utiliser mon catalogue personnalisé » au lancement d'une partie pour jouer ses créations. Les tuiles datées ajoutées augmentent le nombre de tours. La partie conserve une copie du catalogue choisi au départ. Les records personnalisés sont identifiés séparément du meilleur score classique. Une graine identique et un catalogue identique reproduisent le mélange.
 
@@ -50,8 +50,17 @@ Les données sont stockées dans `localStorage` sur l'origine du navigateur. L'e
 - `src/game/engine.ts` : règles et coups indépendants de l'interface.
 - `src/GameBoard.tsx` : plateau, marché, actions et décomptes.
 - `src/Editor.tsx` : atelier de tuiles.
+- `src/artwork.ts` : correspondance des 66 illustrations, cadrages et anciennes références.
 - `src/storage.ts` : sauvegardes locales et exports.
-- `scripts/extract_assets.py` : extraction reproductible des illustrations avec PyMuPDF.
+- `scripts/extract_assets.py` : ancien outil d'extraction des scans, conservé pour référence ; il ne produit pas les illustrations utilisées par l'interface.
+
+## Illustrations
+
+Les six atlas PNG de `public/assets/tiles/` ont été créés avec l'outil intégré `image_gen`. Direction artistique : miniatures architecturales isométriques, volumes mats, silhouettes lisibles, végétation géométrique, verre turquoise et accents de brique. Les prompts finaux sont conservés dans `public/assets/tiles/prompts.json`.
+
+Chaque technologie possède son propre cadrage, avec au moins 362 pixels par case source. L'affichage utilise les atlas natifs sans agrandir les anciens scans. Les symboles et valeurs restent des éléments d'interface nets, indépendants du dessin. Les atlas sont partagés en cache entre les tuiles ; aucun service distant n'est nécessaire pour jouer.
+
+Les anciens chemins d'illustrations sont reconnus à l'import et dans les sauvegardes, puis remplacés par les nouvelles références. Les valeurs, actions préparées, illustrations personnelles et réglages des symboles sont préservés. Les anciens JPG restent archivés dans `public/assets`, mais ne sont plus chargés par le plateau, le marché ou la bibliothèque.
 
 Le mode multijoueur reste à implémenter. Le moteur repose sur les coups de boardgame.io, mais l'état actuel comporte une seule nation. L'extension demandera des états par joueur, un ordre de résolution des décomptes, le classement de recherche final et un transport réseau.
 
@@ -69,4 +78,4 @@ Les tests du moteur couvrent les achats invalides, les remplacements, les accès
 
 ## Crédits
 
-Jeu : Reiner Knizia et Sebastian Bleasdale. Illustrations : Arnaud Demaegd et Neriac. Éditeur : Ystari Games, 2013. Adaptation non officielle ; les illustrations et le livret fournis restent la propriété de leurs ayants droit.
+Jeu : Reiner Knizia et Sebastian Bleasdale. Illustrations du jeu original : Arnaud Demaegd et Neriac. Éditeur : Ystari Games, 2013. Nouvelles illustrations de cette adaptation : générées avec `image_gen`. Adaptation non officielle ; le livret et les anciens scans fournis restent la propriété de leurs ayants droit.

@@ -91,7 +91,7 @@ export default function Editor({ catalog, onSave, onDirty }: Props) {
         </form>
       </aside>
     </div>
-    {gallery && <Modal title="Illustrations du jeu" wide onClose={() => setGallery(false)}><div className="art-gallery">{BASE_CATALOG.map(t => <button key={t.id} onClick={() => { update({ image: t.image }); setGallery(false); }} title={t.name}><TileArt tile={t} /><span>{t.name}</span></button>)}</div></Modal>}
+    {gallery && <Modal title="Illustrations du jeu" wide onClose={() => setGallery(false)}><div className="art-gallery">{BASE_CATALOG.map(t => <button key={t.id} onClick={() => { update({ image: t.image }); setGallery(false); }} title={t.name}><TileArt tile={{ ...t, symbolsOnImage: false }} /><span>{t.name}</span></button>)}</div></Modal>}
     {imported && <Modal title="Importer le catalogue" onClose={() => setImported(null)}><p>Le catalogue importé contient <strong>{imported.length} tuiles</strong>, dont {imported.filter(t => t.decade > 0).length} tuiles datées. Il remplacera votre catalogue enregistré.</p><p>La partie en cours conserve ses propres tuiles.</p><div className="modal-actions"><button className="secondary" onClick={() => setImported(null)}>Annuler</button><button className="primary" onClick={() => { if (onSave(imported)) { setDraft({ ...imported[0] }); setSelected(imported[0].id); mark(false); setImported(null); setStatus('Catalogue importé'); } }}><Upload size={16} />Importer ce catalogue</button></div></Modal>}
   </div>;
 }

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { initialState, previewState } from './game/engine';
-import { BASE_CATALOG, validateCatalog } from './game/catalog';
+import { BASE_CATALOG, SLOTS, validateCatalog } from './game/catalog';
 import { readGame } from './storage';
 
 afterEach(() => vi.unstubAllGlobals());
@@ -10,6 +10,20 @@ function load(game: unknown) {
 }
 
 describe('sauvegardes et compatibilité', () => {
+  it('remplace les scans dans une sauvegarde sans altérer le tour ni sa préparation', () => {
+    const g = initialState();
+    g.catalog = g.catalog.map(tile => ({ ...tile, image: `/assets/${tile.id}.jpg` }));
+    g.board = Object.fromEntries(Object.entries(g.board).map(([id, tile]) => [id, tile ? { ...tile, image: `/assets/${tile.id}.jpg` } : null]));
+    g.phase = 'actions'; g.actions = 2; g.plannedActions = [{ type: 'income' }];
+    const result = load(g);
+    expect(result.error).toBeUndefined();
+    expect(result.game?.catalog).toEqual(BASE_CATALOG);
+    expect(result.game?.board.a1).toEqual(SLOTS[0].initial);
+    expect(result.game?.plannedActions).toEqual(g.plannedActions);
+    expect(result.game?.money).toBe(g.money);
+    expect(previewState(result.game!).money).toBe(g.money + 100);
+    expect(result.game?.custom).toBe(false);
+  });
   it('conserve les actions préparées et permet leur annulation après rechargement', () => {
     const g = initialState();
     g.phase = 'actions'; g.actions = 2;

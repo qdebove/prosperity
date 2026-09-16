@@ -9,6 +9,7 @@ try {
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: `.artifacts/layout-${width}.jpg` });
     const overflow = await page.evaluate(() => [...document.querySelectorAll('body *')].flatMap(el => {
+      if (el.matches('.atlas-frame > img')) return [];
       const rect = el.getBoundingClientRect();
       if (rect.width && (rect.right > innerWidth + 1 || rect.left < -1)) return [{ tag: el.tagName, class: el.className?.baseVal ?? el.className, left: Math.round(rect.left), right: Math.round(rect.right) }];
       return [];
