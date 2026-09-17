@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Client } from 'boardgame.io/client';
-import { BookOpen, Check, ChevronRight, CircleHelp, Globe2, LayoutDashboard, PanelsTopLeft, Plus, Shuffle, Trophy, X } from 'lucide-react';
+import { BookOpen, Check, ChevronRight, CircleHelp, Globe2, LayoutDashboard, Menu, PanelsTopLeft, Plus, Shuffle, Trophy, X } from 'lucide-react';
 import { Brand, Modal } from './components';
 import Editor from './Editor';
 import GameBoard from './GameBoard';
@@ -27,6 +27,7 @@ export default function App() {
   const [custom, setCustom] = useState(false);
   const [message, setMessage] = useState(startup.error ?? '');
   const [saveFailed, setSaveFailed] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const editorDirty = useRef(false);
   const G = state.G;
 
@@ -56,6 +57,7 @@ export default function App() {
   }, []);
 
   function navigate(next: Page) {
+    setMenuOpen(false);
     if (next === page) return;
     if (editorDirty.current && !window.confirm('Abandonner les modifications non enregistrées de la tuile ?')) return;
     editorDirty.current = false;
@@ -76,12 +78,13 @@ export default function App() {
       setClient(makeClient(resume.catalog, gameSeed, resume));
       setState({ ...fresh, G: resume });
       editorDirty.current = false;
-      setPage('game'); setNewOpen(false); setMessage('');
+      setPage('game'); setNewOpen(false); setMenuOpen(false); setMessage('');
     } catch (e) { setMessage((e as Error).message); }
   }
   const best = records.filter(r => !r.custom).reduce((n, r) => Math.max(n, r.score), 0);
 
-  return <div className={`app-shell ${page === 'game' ? 'play-shell' : ''}`}>
+  return <div className={`app-shell ${page === 'game' ? 'play-shell' : ''} ${menuOpen ? 'game-menu-open' : ''}`}>
+    {page === 'game' && <><button className="game-menu-toggle icon-button" aria-label={menuOpen ? 'Fermer le menu' : 'Menu de la partie'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={21} /> : <Menu size={21} />}</button>{menuOpen && <button className="game-menu-backdrop" aria-label="Fermer la navigation" onClick={() => setMenuOpen(false)} />}</>}
     <aside className="sidebar"><a href="#" className="brand-link" onClick={e => { e.preventDefault(); navigate('game'); }} aria-label="Prosperity, la partie"><Brand /></a><div className="sidebar-divider" /><span className="nav-caption">VOTRE ESPACE</span><nav aria-label="Navigation principale">{([{ id: 'game', label: 'La partie', icon: LayoutDashboard }, { id: 'editor', label: 'Atelier de tuiles', icon: PanelsTopLeft }, { id: 'rules', label: 'Règles du jeu', icon: BookOpen }] as const).map(({ id, label, icon: Icon }) => <button key={id} className={page === id ? 'active' : ''} onClick={() => navigate(id)} title={label} aria-label={label} aria-current={page === id ? 'page' : undefined}><Icon size={19} /><span>{label}</span>{page === id && <ChevronRight size={14} className="nav-arrow" />}</button>)}</nav>
       <div className="sidebar-session"><span className="session-indicator" /><span>PARTIE SOLO</span><strong>{G.phase === 'finished' ? 'Partie terminée' : 'Une nation en devenir'}</strong><div className="session-progress"><span style={{ width: `${G.turn / G.totalTurns * 100}%` }} /></div><small>Tour {G.turn} sur {G.totalTurns}</small><button title="Nouvelle partie" aria-label="Nouvelle partie" onClick={() => { setSeed(newSeed()); setNewOpen(true); }}><Plus size={15} /><span>Nouvelle partie</span></button></div>
       <div className="sidebar-bottom"><button className="record-button" title="Votre meilleur score" aria-label="Votre meilleur score" onClick={() => setRecordsOpen(true)}><Trophy size={19} /><span>Votre meilleur score<strong>{best || '—'} <small>points</small></strong></span></button><p>REINER KNIZIA &<br />SEBASTIAN BLEASDALE</p><small>Une adaptation solo · 2013 / 2026</small></div>

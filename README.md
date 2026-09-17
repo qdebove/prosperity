@@ -23,9 +23,13 @@ Le dossier `dist` peut être servi par un hébergement statique. Aucun serveur d
 ## Jeu
 
 - 24 technologies disponibles au départ, puis 36 révélations en sept décennies.
-- Actions directement sur la trésorerie, les jetons de pollution et chacune des deux pistes de recherche.
+- Table de jeu plein écran sur desktop ; navigation générale accessible par le bouton de menu.
+- Technologies disposées en six niveaux entre les branches énergie et écologie, avec prix contextualisés et pions animés sur les 27 cases de recherche.
+- Révélation de la tuile, présentation du décompte puis deux actions matérialisées par des jetons. Revenu, dépollution, recherche et achat restent accessibles en bas de la table.
 - Deux actions préparées par tour : aperçu cumulé, variations chiffrées, annulation de la dernière action ou de toute la préparation, puis validation explicite.
 - Placement par couleur, remplacement des effets, ouverture des deux cases inférieures par le transport de gauche.
+- Achat par clic sur une technologie puis sur une case compatible ; aperçu avant/après au survol ou au focus, remplacement et accès explicités sans fenêtre bloquante.
+- Piste de pollution à disques, symboles de prospérité découverts et alerte explicite à partir de 16 pollutions, y compris au-delà de la piste.
 - Décomptes énergie, écologie, capital, recherche et prospérité, choix du paiement des déficits, allocation de recherche et pollution sans plafond.
 - Décompte final dans l'ordre du livret, journal, annulation de la dernière action, sauvegarde automatique et records locaux.
 - Interface adaptée aux petits écrans, navigation clavier, règles en français et accès au PDF original.
@@ -49,6 +53,9 @@ Les données sont stockées dans `localStorage` sur l'origine du navigateur. L'e
 - `src/game/catalog.ts` : les 60 tuiles, les bâtiments de départ et la validation du catalogue.
 - `src/game/engine.ts` : règles et coups indépendants de l'interface.
 - `src/GameBoard.tsx` : plateau, marché, actions et décomptes.
+- `src/game-ui/` : plateau de recherche, territoire, pollution, détails d’achat et séquence de tour. Les aperçus utilisent le moteur existant ; aucune règle n’est recalculée dans la présentation.
+- `src/table.css` : composition du mode jeu, transitions de 150 à 500 ms et prise en compte de la préférence de réduction des animations.
+- `src/game-ui/sound.ts` : raccordement facultatif de sons locaux de tuile, pion, disque et monnaie. Aucun son provisoire n’est fourni ; le bouton reste coupé tant que `SOUND_ASSETS` est vide.
 - `src/Editor.tsx` : atelier de tuiles.
 - `src/artwork.ts` : correspondance des 66 illustrations, cadrages et anciennes références.
 - `src/storage.ts` : sauvegardes locales et exports.
@@ -74,7 +81,7 @@ npm run build
 npm run test:e2e
 ```
 
-Les tests du moteur couvrent les achats invalides, les remplacements, les accès, les prix, les décomptes, les limites, le score final et une partie complète avec rechargements. Les tests Playwright utilisent Chrome installé localement et le serveur Vite sur le port 5173. Ils vérifient une partie complète, les sauvegardes, l'atelier et le mobile. Les captures sont écrites dans `.artifacts`.
+Les tests du moteur couvrent les achats invalides, les remplacements, les accès, les prix, les décomptes, les limites, le score final et une partie complète avec rechargements. Les tests Playwright utilisent Chrome installé localement et le serveur Vite sur le port 5173. Ils vérifient une partie complète, les sauvegardes, l'atelier et le mobile, ainsi que les pions, les remplacements, les accès et la pollution critique. Les quatre formats desktop (1366×768, 1440×900, 1920×1080, 2560×1440) sont contrôlés avec les 60 technologies révélées. Les captures sont écrites dans `.artifacts`. `node scripts/check_table.mjs` produit aussi des vues du plateau et d’un achat avec remplacement.
 
 ## Crédits
 

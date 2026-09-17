@@ -1,3 +1,4 @@
+import { enterActions, navigate } from './ui';
 import { expect, test, type Page } from '@playwright/test';
 
 async function checkFrames(page: Page, selector: string) {
@@ -30,11 +31,11 @@ test('66 illustrations distinctes et non vides, aucun scan affiché', async ({ p
   await page.screenshot({ path: '.artifacts/illustrated-mobile.jpg' });
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
   await page.getByTestId('slot-a1').click();
-  await expect(page.getByRole('dialog').locator('[data-symbol="energy"]')).toHaveText('+2');
-  await expect(page.getByRole('dialog').locator('[data-symbol="ecology"]')).toHaveText('-1');
-  await page.getByRole('button', { name: 'Fermer', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Détails de la technologie' }).locator('[data-symbol="energy"]')).toHaveText('+2');
+  await expect(page.getByRole('region', { name: 'Détails de la technologie' }).locator('[data-symbol="ecology"]')).toHaveText('-1');
+  await page.getByRole('button', { name: 'Fermer les détails', exact: true }).click();
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.getByRole('button', { name: 'Atelier de tuiles', exact: true }).click();
+  await navigate(page, 'Atelier de tuiles');
   const technologies = await checkFrames(page, '.library-grid .atlas-frame');
   expect(technologies).toHaveLength(60);
   const all = [...starting, ...technologies];
@@ -57,7 +58,7 @@ test('66 illustrations distinctes et non vides, aucun scan affiché', async ({ p
 test('une sauvegarde existante reçoit les nouveaux visuels et garde son état', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
-  if (await page.getByRole('button', { name: 'Valider', exact: true }).isVisible()) await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await enterActions(page);
   await page.getByRole('button', { name: /Revenus/ }).click();
   const previous = await page.evaluate(() => {
     const game = JSON.parse(localStorage.getItem('prosperity.game.v1')!);

@@ -1,3 +1,4 @@
+import { enterActions, navigate } from './ui';
 import { test, expect } from '@playwright/test';
 
 test('desktop: plateau, achat, sauvegarde et atelier', async ({ page }) => {
@@ -5,11 +6,10 @@ test('desktop: plateau, achat, sauvegarde et atelier', async ({ page }) => {
   page.on('pageerror', e => errors.push(e.message));
   await page.setViewportSize({ width: 1440, height: 1080 });
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Votre nation', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Une nation en devenir', exact: true })).toBeVisible();
   await page.screenshot({ path: '.artifacts/desktop.jpg', fullPage: true });
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
-  const resolve = page.getByRole('button', { name: 'Valider', exact: true });
-  if (await resolve.isVisible()) await resolve.click();
+  await enterActions(page);
   await page.getByRole('button', { name: /Revenus/ }).click();
   await page.getByRole('button', { name: 'Centrale au fioul, 100 euros', exact: true }).click();
   await page.getByTestId('slot-b1').click();
@@ -32,7 +32,7 @@ test('desktop: plateau, achat, sauvegarde et atelier', async ({ page }) => {
   expect(staged.board.b1.id).toBe('initial-20');
   expect(staged.plannedActions).toEqual([]);
   expect(staged.phase).toBe('committed');
-  await page.getByRole('button', { name: 'Atelier de tuiles', exact: true }).click();
+  await navigate(page, 'Atelier de tuiles');
   await page.screenshot({ path: '.artifacts/editor.jpg', fullPage: false });
   await page.getByRole('button', { name: 'Nouvelle tuile', exact: true }).click();
   await page.getByRole('textbox', { name: 'Nom de la tuile' }).fill('Forêt expérimentale');
@@ -40,7 +40,7 @@ test('desktop: plateau, achat, sauvegarde et atelier', async ({ page }) => {
   await page.getByRole('button', { name: 'Enregistrer la tuile' }).click();
   await expect(page.getByRole('status')).toContainText('Tuile enregistrée');
   await page.reload();
-  await page.getByRole('button', { name: 'Atelier de tuiles', exact: true }).click();
+  await navigate(page, 'Atelier de tuiles');
   await page.getByRole('textbox', { name: 'Rechercher dans la collection' }).fill('Forêt expérimentale');
   await expect(page.getByRole('button', { name: 'Forêt expérimentale', exact: true })).toBeVisible();
   const download = page.waitForEvent('download');
@@ -57,20 +57,18 @@ test('mobile: affichage sans débordement, navigation et actions', async ({ page
   await page.screenshot({ path: '.artifacts/mobile.jpg', fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
-  if (await page.getByRole('button', { name: 'Valider', exact: true }).isVisible()) await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await enterActions(page);
   const before = await page.evaluate(() => JSON.parse(localStorage.getItem('prosperity.game.v1')!));
   await page.getByRole('button', { name: 'Rechercher en énergie : avancer d’une case' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  await page.getByRole('button', { name: /Dépolluer/ }).filter({ visible: true }).first().click();
+  await page.getByRole('button', { name: /Dépolluer : retirer/ }).first().click();
   await expect(page.getByRole('button', { name: 'Valider le tour', exact: true })).toBeEnabled();
   await page.screenshot({ path: '.artifacts/mobile-planned.jpg', fullPage: true });
   await page.getByRole('button', { name: 'Annuler les deux actions' }).click();
   await expect(page.getByTestId('pollution-preview')).toHaveText(`${before.pollution}`);
   await expect(page.getByRole('button', { name: 'Valider le tour', exact: true })).toBeDisabled();
   await page.getByRole('button', { name: 'Rechercher en écologie : avancer d’une case' }).click();
-  await page.getByRole('tab', { name: /Marché/ }).click();
-  await expect(page.getByRole('region', { name: 'Marché des technologies' })).toBeVisible();
-  await page.getByRole('tab', { name: 'Plateau', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Plateau de recherche et technologies' })).toBeVisible();
   await page.getByRole('button', { name: /Revenus/ }).click();
   await page.getByRole('button', { name: 'Valider le tour', exact: true }).click();
   const after = await page.evaluate(() => JSON.parse(localStorage.getItem('prosperity.game.v1')!));
@@ -78,7 +76,7 @@ test('mobile: affichage sans débordement, navigation et actions', async ({ page
   expect(after.research.ecology).toBe(before.research.ecology + 1);
   expect(after.money).toBe(before.money + 100);
   expect(after.pollution).toBe(before.pollution);
-  await page.getByRole('button', { name: 'Atelier de tuiles', exact: true }).click();
+  await navigate(page, 'Atelier de tuiles');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: '.artifacts/editor-mobile.jpg', fullPage: true });
   await page.getByRole('button', { name: 'Règles du jeu', exact: true }).click();
@@ -91,12 +89,13 @@ test('une partie entière jusqu’au score final et au record', async ({ page })
   for (let step = 0; step < 220; step++) {
     const g = await page.evaluate(() => JSON.parse(localStorage.getItem('prosperity.game.v1')!));
     if (g.phase === 'finished') break;
+    if (g.phase === 'actions' && !g.plannedActions.length) await enterActions(page);
     if (g.phase === 'energy' || g.phase === 'research') await page.getByRole('button', { name: 'Valider', exact: true }).click();
     else if (g.phase === 'final') await page.getByRole('button', { name: /^Décompter :/ }).click();
     else if (g.phase === 'draw') await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
     else if (g.phase === 'committed') await page.getByRole('button', { name: g.deck.length ? 'Tour suivant' : 'Décompte final', exact: true }).click();
     else if (g.plannedActions.length === g.actions) await page.getByRole('button', { name: 'Valider le tour', exact: true }).click();
-    else if (g.pollution > g.plannedActions.filter((a: { type: string }) => a.type === 'cleanup').length) await page.getByRole('button', { name: /Dépolluer/ }).first().click();
+    else if (g.pollution > g.plannedActions.filter((a: { type: string }) => a.type === 'cleanup').length) await page.getByRole('button', { name: /Dépolluer : retirer/ }).first().click();
     else await page.getByRole('button', { name: /Revenus/ }).click();
   }
   await expect(page.getByRole('heading', { name: /points de prospérité/ })).toBeVisible();
@@ -107,14 +106,14 @@ test('une partie entière jusqu’au score final et au record', async ({ page })
   await page.screenshot({ path: '.artifacts/finished.jpg', fullPage: true });
   await page.reload();
   await expect(page.getByRole('heading', { name: /points de prospérité/ })).toBeVisible();
-  await page.getByRole('button', { name: /Votre meilleur score/ }).click();
+  await navigate(page, 'Votre meilleur score');
   await expect(page.getByRole('dialog')).toContainText('Classique');
 });
 
 test('catalogue personnalisé: modification, import validé et nouvelle partie', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Atelier de tuiles', exact: true }).click();
+  await navigate(page, 'Atelier de tuiles');
   await page.getByRole('spinbutton', { name: 'Valeur Écologie' }).fill('3');
   await page.getByRole('button', { name: 'Enregistrer la tuile' }).click();
   await expect(page.getByRole('status')).toContainText('Tuile enregistrée');
@@ -127,7 +126,7 @@ test('catalogue personnalisé: modification, import validé et nouvelle partie',
   await page.getByLabel('Importer un catalogue JSON').setInputFiles({ name: 'valid.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ version: 1, tiles: saved })) });
   await expect(page.getByRole('dialog')).toContainText('60 tuiles');
   await page.getByRole('button', { name: 'Importer ce catalogue' }).click();
-  await page.getByRole('button', { name: 'Nouvelle partie', exact: true }).click();
+  await navigate(page, 'Nouvelle partie');
   await page.getByRole('dialog').getByRole('checkbox').check();
   await page.getByRole('textbox', { name: 'Graine du mélange' }).fill('catalogue-test');
   await page.getByRole('button', { name: 'Fonder ma nation' }).click();
@@ -135,7 +134,7 @@ test('catalogue personnalisé: modification, import validé et nouvelle partie',
   const g = await page.evaluate(() => JSON.parse(localStorage.getItem('prosperity.game.v1')!));
   expect(g.catalog[0].ecology).toBe(3);
   expect(g.totalTurns).toBe(36);
-  await page.getByRole('button', { name: 'Atelier de tuiles', exact: true }).click();
+  await navigate(page, 'Atelier de tuiles');
   await page.locator('img').evaluateAll(images => images.forEach(img => img.loading = 'eager'));
   await page.waitForFunction(() => [...document.images].every(img => img.complete && img.naturalWidth > 0));
 });
@@ -145,7 +144,7 @@ test('dimensions variées et absence de débordements', async ({ page }) => {
   for (const width of [320, 768, 1024, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `largeur ${width}`).toBe(true);
-    await page.getByRole('button', { name: 'Atelier de tuiles', exact: true }).click();
+    await navigate(page, 'Atelier de tuiles');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `atelier ${width}`).toBe(true);
     await page.getByRole('button', { name: 'La partie', exact: true }).click();
   }
@@ -154,7 +153,7 @@ test('dimensions variées et absence de débordements', async ({ page }) => {
 test('illustration personnalisée: cinq symboles, aperçu, export et partie', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Atelier de tuiles', exact: true }).click();
+  await navigate(page, 'Atelier de tuiles');
   await page.getByRole('button', { name: 'Nouvelle tuile', exact: true }).click();
   await page.getByRole('textbox', { name: 'Nom de la tuile' }).fill('Ville expérimentale');
   await page.getByLabel('Importer une illustration').setInputFiles('public/assets/city.jpg');
@@ -189,7 +188,7 @@ test('illustration personnalisée: cinq symboles, aperçu, export et partie', as
   await page.getByLabel('Importer un catalogue JSON').setInputFiles(path!);
   await page.getByRole('button', { name: 'Importer ce catalogue' }).click();
   await page.reload();
-  await page.getByRole('button', { name: 'Nouvelle partie', exact: true }).click();
+  await navigate(page, 'Nouvelle partie');
   await page.getByRole('dialog').getByRole('checkbox').check();
   await page.getByRole('button', { name: 'Fonder ma nation' }).click();
   const card = page.getByRole('button', { name: /^Ville expérimentale,/ });
@@ -202,7 +201,7 @@ test('illustration personnalisée: cinq symboles, aperçu, export et partie', as
   }));
   expect(overflowing).toBe(false);
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
-  if (await page.getByRole('button', { name: 'Valider', exact: true }).isVisible()) await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await enterActions(page);
   await card.click();
   await page.getByTestId('slot-a2').click();
   const placed = page.getByTestId('slot-a2');
@@ -220,6 +219,6 @@ test('illustration personnalisée: cinq symboles, aperçu, export et partie', as
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: '.artifacts/custom-mobile-board.jpg' });
   await placed.click();
-  await expect(page.getByRole('dialog').locator('.art-symbol')).toHaveCount(5);
-  await expect(page.getByRole('dialog').locator('[data-symbol="energy"] b')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Détails de la technologie' }).locator('.art-symbol')).toHaveCount(5);
+  await expect(page.getByRole('region', { name: 'Détails de la technologie' }).locator('[data-symbol="energy"] b')).toBeVisible();
 });
