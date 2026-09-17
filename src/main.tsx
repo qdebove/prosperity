@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import Multiplayer from './multiplayer/Multiplayer';
 import '@fontsource/dm-sans/latin-400.css';
 import '@fontsource/dm-sans/latin-500.css';
 import '@fontsource/dm-sans/latin-600.css';
@@ -10,4 +11,5 @@ import './styles.css';
 import './play.css';
 import './table.css';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);
+const Screen = /^\/(multiplayer|game)(\/|$)/.test(location.pathname) ? Multiplayer : App;
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><Screen /></React.StrictMode>);

@@ -1,4 +1,4 @@
-# Prosperity, version web solo
+# Prosperity, version web solo et multijoueur
 
 Adaptation française jouable de Prosperity (Reiner Knizia et Sebastian Bleasdale), réalisée à partir de `bb-prosperity-rulebook.pdf`. Les règles proviennent du document fourni ; les 60 technologies et les 6 bâtiments de départ disposent désormais d'illustrations isométriques originales générées pour cette adaptation.
 
@@ -18,7 +18,7 @@ npm run build
 npm run preview
 ```
 
-Le dossier `dist` peut être servi par un hébergement statique. Aucun serveur de jeu, compte ou service distant n'est nécessaire ; polices, illustrations et règles sont incluses dans le projet.
+Le dossier `dist` peut être servi par un hébergement statique pour le solo. Polices, illustrations et règles sont incluses dans le projet.
 
 ## Jeu
 
@@ -69,9 +69,25 @@ Chaque technologie possède son propre cadrage, avec au moins 362 pixels par cas
 
 Les anciens chemins d'illustrations sont reconnus à l'import et dans les sauvegardes, puis remplacés par les nouvelles références. Les valeurs, actions préparées, illustrations personnelles et réglages des symboles sont préservés. Les anciens JPG restent archivés dans `public/assets`, mais ne sont plus chargés par le plateau, le marché ou la bibliothèque.
 
-Le mode multijoueur reste à implémenter. Le moteur repose sur les coups de boardgame.io, mais l'état actuel comporte une seule nation. L'extension demandera des états par joueur, un ordre de résolution des décomptes, le classement de recherche final et un transport réseau.
+## Multijoueur réseau
 
-L'audit npm signale des vulnérabilités dans des dépendances transitives de boardgame.io (notamment sa pile serveur et son outillage Svelte), ainsi que dans l'outillage de test Vitest. Le jeu utilise uniquement le client local, sans serveur multijoueur, sans rendu Svelte et avec le débogueur désactivé. La mise à niveau de ces dépendances doit faire partie du travail avant l'introduction d'un serveur public ; une rétrogradation forcée de boardgame.io n'a pas été appliquée.
+```sh
+npm run dev:multi
+```
+
+Ouvrir `http://127.0.0.1:5173/multiplayer`, créer une partie et partager le lien. Deux à quatre joueurs rejoignent, se déclarent prêts, puis le créateur lance. Pour tester plusieurs joueurs sur une machine, utiliser des profils de navigateur distincts. Le menu du solo propose également « Jouer en multijoueur ».
+
+Le serveur Node (`npm run server`, port 8000) reste autoritaire. Chacun possède sa nation ; les décomptes s’appliquent dans l’ordre de la table et le classement final rétablit les bonus de recherche multijoueurs. Les territoires sont consultables et les marqueurs de recherche numérotés identifient tous les joueurs.
+
+Les deux actions sont préparées et prévisualisées exclusivement dans le navigateur, avec annulation et sauvegarde locale. La validation envoie un seul batch, rejoué atomiquement par le moteur serveur. Les autres joueurs ne reçoivent les actions qu’après validation et sauvegarde. Les doubles envois sont reconnus sans rejouer le tour.
+
+Une reconnexion retrouve la session invitée et un snapshot complet. La préparation n’est restaurée que si joueur, tour et révision correspondent encore. Le code partagé seul ne permet pas d’usurper un siège. Fermer le navigateur du créateur ne coupe pas une partie lancée.
+
+`server/app.ts` compose les adaptateurs de stockage et d’identité avec le transport boardgame.io. Le stockage de développement est en mémoire : **redémarrer le serveur efface les parties**. Pour utiliser une base, implémenter `MatchStore`, l’injecter dans ce point de composition et configurer ses paramètres. Aucune règle de Prosperity n’a à être modifiée. Aucun fournisseur cloud n’est imposé.
+
+Les fichiers principaux sont `src/multiplayer/game.ts` (orchestration), `draft.ts` (préparation privée), `NetworkGame.tsx` (plateau distant), et `server/` (lobby, identité, stockage et intégration du transport natif). [La documentation multijoueur](docs/multiplayer.md) décrit les protocoles, le filtrage des secrets, la reconnexion, les points d’extension et les variables d’environnement pour un déploiement futur.
+
+Les dépendances serveur vulnérables et Vitest ont reçu des mises à jour ciblées, sans rétrograder boardgame.io. L’audit laisse deux alertes modérées liées à Svelte et à leur remontée sur boardgame.io ; ce débogueur et son rendu SSR ne sont pas utilisés (`debug: false`). Le détail et les limites de déploiement figurent dans la documentation.
 
 ## Vérifications
 
@@ -81,7 +97,9 @@ npm run build
 npm run test:e2e
 ```
 
-Les tests du moteur couvrent les achats invalides, les remplacements, les accès, les prix, les décomptes, les limites, le score final et une partie complète avec rechargements. Les tests Playwright utilisent Chrome installé localement et le serveur Vite sur le port 5173. Ils vérifient une partie complète, les sauvegardes, l'atelier et le mobile, ainsi que les pions, les remplacements, les accès et la pollution critique. Les quatre formats desktop (1366×768, 1440×900, 1920×1080, 2560×1440) sont contrôlés avec les 60 technologies révélées. Les captures sont écrites dans `.artifacts`. `node scripts/check_table.mjs` produit aussi des vues du plateau et d’un achat avec remplacement.
+Les tests du moteur couvrent les achats invalides, les remplacements, les accès, les prix, les décomptes, les limites, le score final et une partie complète avec rechargements. Les tests Playwright utilisent Chrome installé localement et démarrent Vite sur le port 5173 ainsi que le serveur de jeu sur le port 8000 si nécessaire. Ils vérifient une partie complète, les sauvegardes, l'atelier et le mobile, ainsi que les pions, les remplacements, les accès et la pollution critique. Les quatre formats desktop (1366×768, 1440×900, 1920×1080, 2560×1440) sont contrôlés avec les 60 technologies révélées. Les captures sont écrites dans `.artifacts`. `node scripts/check_table.mjs` produit aussi des vues du plateau et d’un achat avec remplacement.
+
+Les tests multijoueurs couvrent aussi les cinq décomptes par nation, les choix obligatoires, les batches dépendants et atomiques, les doublons, les préparations obsolètes, les secrets des snapshots et de vraies connexions réseau. Un scénario Playwright ouvre trois contextes Chrome indépendants et vérifie création, préparation privée, annulation, commits, rechargement, coupure réseau et affichage mobile.
 
 ## Crédits
 

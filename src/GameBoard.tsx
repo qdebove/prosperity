@@ -3,7 +3,7 @@ import { Check, Coins, FlaskConical, Globe2, History, Leaf, RotateCcw, ShoppingB
 import { Modal, TileArt } from './components';
 import { legalSlots, previewState, priceOf } from './game/engine';
 import type { GameState, Tile, Track } from './game/types';
-import ResearchBoard from './game-ui/ResearchBoard';
+import ResearchBoard, { type ResearchMarker } from './game-ui/ResearchBoard';
 import PlayerTerritory from './game-ui/PlayerTerritory';
 import PollutionTrack from './game-ui/PollutionTrack';
 import TechnologyDetails from './game-ui/TechnologyDetails';
@@ -13,7 +13,7 @@ import { playGameSound, soundAvailable } from './game-ui/sound';
 type ActionMode = 'research' | 'cleanup' | 'buy' | null;
 interface Flight { tile: Tile; from: DOMRect; to: DOMRect }
 
-export default function GameBoard({ committed, moves, onNew }: { committed: GameState; moves: Moves; onNew: () => void }) {
+export default function GameBoard({ committed, moves, onNew, enabled = true, waitingMessage, markers }: { committed: GameState; moves: Moves; onNew: () => void; enabled?: boolean; waitingMessage?: string; markers?: ResearchMarker[] }) {
   const G = useMemo(() => previewState(committed), [committed]);
   const [selected, setSelected] = useState<Tile | null>(null);
   const [hoveredSlot, setHoveredSlot] = useState<string>();
@@ -26,7 +26,7 @@ export default function GameBoard({ committed, moves, onNew }: { committed: Game
   const [presentation, setPresentation] = useState<Presentation>(() => committed.phase === 'actions' && !committed.plannedActions.length && committed.lastMove !== 'action' ? 'tally' : null);
   const current = G.catalog.find(t => t.id === G.current);
   const planning = G.phase === 'actions';
-  const active = planning && G.actions > 0 && !presentation;
+  const active = enabled && planning && G.actions > 0 && !presentation;
   const purchasing = !!selected && G.market.includes(selected.id);
   const tile = purchasing ? selected! : undefined;
   const targets = tile && active && priceOf(G, tile) <= G.money ? legalSlots(G, tile) : [];
@@ -72,9 +72,9 @@ export default function GameBoard({ committed, moves, onNew }: { committed: Game
       <div className="nation-space"><PlayerTerritory G={G} committed={committed} tile={tile?.category !== 'special' ? tile : undefined} targets={targets} highlighted={tally ? current?.tally : undefined} onPlace={buy} onInspect={t => { setSelected(t); setMode(null); }} onHover={setHoveredSlot} />
         <PollutionTrack value={G.pollution} active={active} focused={mode === 'cleanup' || tally && current?.tally === 'ecology'} onCleanup={() => { clear(); moves.cleanup(); playGameSound('disc', muted); }} />
       </div>
-      <ResearchBoard G={G} selected={tile?.id} active={active} focused={mode === 'research' || mode === 'buy'} onResearch={research} onSelect={t => { setSelected(selected?.id === t.id ? null : t); setHoveredSlot(undefined); setMode(selected?.id === t.id ? null : 'buy'); }} />
+      <ResearchBoard G={G} markers={markers} selected={tile?.id} active={active} focused={mode === 'research' || mode === 'buy'} onResearch={research} onSelect={t => { setSelected(selected?.id === t.id ? null : t); setHoveredSlot(undefined); setMode(selected?.id === t.id ? null : 'buy'); }} />
       <aside className="table-context" aria-label="Tour et sélection">
-        <TurnFlow G={G} moves={moves} presentation={presentation} onDraw={draw} onContinue={() => setPresentation(null)} onNew={onNew} />
+        <TurnFlow G={G} moves={moves} enabled={enabled} waitingMessage={waitingMessage} presentation={presentation} onDraw={draw} onContinue={() => setPresentation(null)} onNew={onNew} />
         {selected ? <TechnologyDetails G={G} tile={selected} purchasing={purchasing} slot={hoveredSlot} active={active} onBuy={() => buy()} onClose={clear} /> : <div className="table-aside-note"><span className="ornament">✦</span><h3>{mode === 'research' ? 'Faites avancer votre pion' : mode === 'cleanup' ? 'Découvrez la prospérité' : mode === 'buy' ? 'Une technologie, un avenir' : 'Construire avec mesure'}</h3><p>{mode === 'research' ? 'Choisissez Énergie ou Écologie au sommet des pistes. Une case peut ouvrir un nouveau niveau et réduire vos prix.' : mode === 'cleanup' ? 'Cliquez sur la piste de pollution pour retirer un disque. Chaque symbole découvert vaut un point au décompte de prospérité.' : mode === 'buy' ? 'Choisissez une tuile, puis une case compatible de votre territoire. Son prix dépend de votre pion de recherche.' : 'Développez votre territoire et préservez son équilibre. La recherche rend les technologies plus accessibles.'}</p></div>}
       </aside>
     </div>
@@ -87,7 +87,7 @@ export default function GameBoard({ committed, moves, onNew }: { committed: Game
         <button disabled={!active} aria-pressed={mode === 'research'} onClick={() => chooseMode('research')}><FlaskConical size={19} /><span>Recherche<small>+1 case</small></span></button>
         <button disabled={!active} aria-pressed={mode === 'buy'} onClick={() => chooseMode('buy')}><ShoppingBag size={19} /><span>Acheter<small>Une technologie</small></span></button>
       </div>
-      <div className="turn-validation"><div className="plan-rollback"><button className="icon-button" aria-label="Annuler la dernière action" title="Annuler la dernière action" disabled={!planned.length} onClick={() => { clear(); moves.undoPlan(); }}><Undo2 size={18} /></button><button className="icon-button" aria-label="Annuler les deux actions" title="Annuler les deux actions" disabled={!planned.length} onClick={() => { clear(); moves.resetPlan(); }}><RotateCcw size={17} /></button></div><button className="primary commit-button" aria-label="Valider le tour" disabled={!planning || G.actions !== 0 || !planned.length} onClick={() => { clear(); moves.commit(); }}>Terminer le tour<Check size={16} /></button></div>
+      <div className="turn-validation"><div className="plan-rollback"><button className="icon-button" aria-label="Annuler la dernière action" title="Annuler la dernière action" disabled={!enabled || !planned.length} onClick={() => { clear(); moves.undoPlan(); }}><Undo2 size={18} /></button><button className="icon-button" aria-label="Annuler les deux actions" title="Annuler les deux actions" disabled={!enabled || !planned.length} onClick={() => { clear(); moves.resetPlan(); }}><RotateCcw size={17} /></button></div><button className="primary commit-button" aria-label="Valider le tour" disabled={!enabled || !planning || G.actions !== 0 || !planned.length} onClick={() => { clear(); moves.commit(); }}>Terminer le tour<Check size={16} /></button></div>
     </section>
     {flight && <FlyingTile key={`${flight.tile.id}-${G.actions}`} flight={flight} onEnd={finishFlight} />}
     {journal && <Modal title="Journal de la nation" wide onClose={() => setJournal(false)}><ol className="full-journal">{committed.log.slice().reverse().map((entry, i) => <li className={entry.kind} key={i}><span>Tour {entry.turn}</span><p>{entry.text}</p></li>)}</ol></Modal>}
@@ -103,7 +103,7 @@ function ResourceValue({ value, unit, testId }: { value: number; unit: string; t
     const timeout = window.setTimeout(() => setChange(null), 1400);
     return () => window.clearTimeout(timeout);
   }, [value]);
-  return <span className="resource-number"><strong key={value} data-testid={testId}>{value} {unit}</strong>{change && <span className="resource-change" key={value} aria-live="polite" title={`${change.from} ${unit} → ${value} ${unit}`}>{change.delta > 0 ? '+' : ''}{change.delta} {unit}</span>}</span>;
+  return <span className="resource-number"><strong key={`value-${value}`} data-testid={testId}>{value} {unit}</strong>{change && <span className="resource-change" key={`change-${value}`} aria-live="polite" title={`${change.from} ${unit} → ${value} ${unit}`}>{change.delta > 0 ? '+' : ''}{change.delta} {unit}</span>}</span>;
 }
 
 function FlyingTile({ flight, onEnd }: { flight: Flight; onEnd: () => void }) {

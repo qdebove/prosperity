@@ -10,7 +10,7 @@ export function priceReason(G: GameState, tile: Tile) {
 }
 
 // A marker has its own identity so another nation can share these same tracks.
-export interface ResearchMarker { id: string; label: string; track: Track; position: number }
+export interface ResearchMarker { id: string; label: string; track: Track; position: number; playerNumber?: number }
 function markerTop(position: number) {
   const level = levelAt(position);
   const step = position - LEVEL_STARTS[level - 1];
@@ -41,7 +41,7 @@ export default function ResearchBoard({ G, selected, active, focused, onSelect, 
       </div>)}
       <div className="research-rails" aria-label="Marqueurs de recherche">{(['energy', 'ecology'] as Track[]).map(track => <div className={`research-rail ${track}`} key={track}>
         {Array.from({ length: MAX_RESEARCH + 1 }, (_, i) => <i key={i} className={i <= G.research[track] ? 'reached' : ''} style={{ top: `${markerTop(i)}%` }} />)}
-        {markers.filter(m => m.track === track).map((marker, i) => <span key={marker.id} data-testid={`marker-${marker.id}`} className={`research-pawn symbol-${track}`} style={{ top: `${markerTop(marker.position)}%`, marginLeft: i * 7 }} role="img" aria-label={`${marker.label} · ${LABELS[track]} · niveau ${levelAt(marker.position)}, case ${marker.position + 1}`}><SymbolIcon name={track} size={12} /></span>)}
+        {markers.filter(m => m.track === track).map((marker, i) => <span key={marker.id} data-testid={`marker-${marker.id}`} className={`research-pawn symbol-${track} ${marker.playerNumber ? `nation-color-${marker.playerNumber - 1}` : ''}`} style={{ top: `${markerTop(marker.position)}%`, marginLeft: marker.playerNumber ? (i % 2) * 10 - 5 : i * 7, marginTop: marker.playerNumber ? Math.floor(i / 2) * 12 - 6 : 0 }} role="img" title={`${marker.label} · ${LABELS[track]} · case ${marker.position + 1}`} aria-label={`${marker.label} · ${LABELS[track]} · niveau ${levelAt(marker.position)}, case ${marker.position + 1}`}>{marker.playerNumber ?? <SymbolIcon name={track} size={12} />}</span>)}
       </div>)}</div>
     </div>
     <p className="research-footnote">Un pion avance d’une case par action. Cliquez sur une tuile pour préparer son achat.</p>

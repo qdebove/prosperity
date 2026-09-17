@@ -55,7 +55,7 @@ function returnFromTally(G: GameState) {
   G.phase = G.finalStep >= 0 ? 'final' : 'actions';
 }
 
-function tally(G: GameState, symbol: Symbol) {
+export function tally(G: GameState, symbol: Symbol, researchRanking = false) {
   const s = totals(G);
   const kind = G.finalStep >= 0 ? 'final' : 'event';
   if (symbol === 'energy') {
@@ -80,7 +80,7 @@ function tally(G: GameState, symbol: Symbol) {
   } else if (symbol === 'research') {
     if (G.finalStep >= 0) {
       for (const track of ['energy', 'ecology'] as Track[]) G.research[track] = Math.min(MAX_RESEARCH, G.research[track] + s.research);
-      log(G, `Recherche finale : +${s.research} cases sur chaque piste. Pas de classement en solo.`, 'final');
+      log(G, `Recherche finale : +${s.research} cases sur chaque piste.${researchRanking ? '' : ' Pas de classement en solo.'}`, 'final');
     } else if (s.research > 0 && (G.research.energy < MAX_RESEARCH || G.research.ecology < MAX_RESEARCH)) {
       G.pending = s.research; G.phase = 'research'; return;
     } else log(G, 'Recherche : aucune progression disponible.', kind);
@@ -149,6 +149,30 @@ function planAction(G: GameState, action: PlannedAction) {
   G.plannedActions.push(action);
 }
 
+// Shared by solo moves and the authoritative multiplayer tally queue.
+export function resolveEnergy(G: GameState, paidUnits: number): boolean {
+  if (G.phase !== 'energy' || !Number.isInteger(paidUnits) || paidUnits < 0 || paidUnits > G.pending || paidUnits * 100 > G.money) return false;
+  G.money -= paidUnits * 100;
+  G.pollution += G.pending - paidUnits;
+  log(G, `Déficit énergétique : -${paidUnits * 100} €, +${G.pending - paidUnits} pollution.`, G.finalStep >= 0 ? 'final' : 'event');
+  G.lastMove = 'resolve';
+  returnFromTally(G);
+  return true;
+}
+
+export function resolveResearch(G: GameState, energy: number): boolean {
+  if (G.phase !== 'research' || !Number.isInteger(energy)) return false;
+  const available = Math.min(G.pending, MAX_RESEARCH * 2 - G.research.energy - G.research.ecology);
+  const ecology = available - energy;
+  if (energy < 0 || ecology < 0 || energy > MAX_RESEARCH - G.research.energy || ecology > MAX_RESEARCH - G.research.ecology) return false;
+  G.research.energy += energy;
+  G.research.ecology += ecology;
+  log(G, `Recherche : +${energy} énergie, +${ecology} écologie.`, 'event');
+  G.lastMove = 'resolve';
+  returnFromTally(G);
+  return true;
+}
+
 export function createGame(catalog: Tile[] = BASE_CATALOG, seed = 'prosperity', saved?: GameState): Game<GameState> {
   return {
     name: 'prosperity-solo', seed, minPlayers: 1, maxPlayers: 1,
@@ -206,26 +230,13 @@ export function createGame(catalog: Tile[] = BASE_CATALOG, seed = 'prosperity', 
       resolveEnergy: {
         undoable: false,
         move: ({ G }, paidUnits: number) => {
-          if (G.phase !== 'energy' || !Number.isInteger(paidUnits) || paidUnits < 0 || paidUnits > G.pending || paidUnits * 100 > G.money) return INVALID_MOVE;
-          G.money -= paidUnits * 100;
-          G.pollution += G.pending - paidUnits;
-          log(G, `Déficit énergétique : -${paidUnits * 100} €, +${G.pending - paidUnits} pollution.`, G.finalStep >= 0 ? 'final' : 'event');
-          G.lastMove = 'resolve';
-          returnFromTally(G);
+          if (!resolveEnergy(G, paidUnits)) return INVALID_MOVE;
         },
       },
       resolveResearch: {
         undoable: false,
         move: ({ G }, energy: number) => {
-          if (G.phase !== 'research' || !Number.isInteger(energy)) return INVALID_MOVE;
-          const available = Math.min(G.pending, MAX_RESEARCH * 2 - G.research.energy - G.research.ecology);
-          const ecology = available - energy;
-          if (energy < 0 || ecology < 0 || energy > MAX_RESEARCH - G.research.energy || ecology > MAX_RESEARCH - G.research.ecology) return INVALID_MOVE;
-          G.research.energy += energy;
-          G.research.ecology += ecology;
-          log(G, `Recherche : +${energy} énergie, +${ecology} écologie.`, 'event');
-          G.lastMove = 'resolve';
-          returnFromTally(G);
+          if (!resolveResearch(G, energy)) return INVALID_MOVE;
         },
       },
       nextFinal: {
