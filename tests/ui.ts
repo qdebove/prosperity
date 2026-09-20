@@ -10,6 +10,6 @@ export async function enterActions(page: Page) {
   await expect(page.locator('.revealing')).toHaveCount(0);
   const resolve = page.getByRole('button', { name: 'Valider', exact: true });
   if (await resolve.isVisible()) await resolve.click();
-  const proceed = page.getByRole('button', { name: 'Jouer mes deux actions' });
+  const proceed = page.getByRole('button', { name: 'Continuer vers mes actions' });
   if (await proceed.isVisible()) await proceed.click();
 }

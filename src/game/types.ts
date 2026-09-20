@@ -24,7 +24,7 @@ export interface Slot {
   requires?: string;
   initial?: Tile;
 }
-export interface LogEntry { turn: number; text: string; kind: 'event' | 'action' | 'final' }
+export interface LogEntry { turn: number; text: string; kind: 'event' | 'action' | 'final'; revealedTileId?: string }
 export type PlannedAction =
   | { type: 'income' }
   | { type: 'cleanup' }

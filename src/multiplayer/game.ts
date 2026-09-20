@@ -117,7 +117,7 @@ export function createMultiplayerGame(seed?: string): Game<AuthoritativeGameStat
         G.shared.lastMove = 'draw';
         const tile = G.shared.catalog.find(t => t.id === G.shared.current)!;
         G.shared.market.push(tile.id);
-        G.shared.log.push({ turn: G.shared.turn, kind: 'event', text: `${G.participants.find(p => p.playerId === playerID)!.displayName} révèle ${tile.name}. Décompte ${LABELS[tile.tally]}.` });
+        G.shared.log.push({ turn: G.shared.turn, kind: 'event', revealedTileId: tile.id, text: `${G.participants.find(p => p.playerId === playerID)!.displayName} révèle ${tile.name}. Décompte ${LABELS[tile.tally]}.` });
         startTally(G, ctx, tile.tally);
       } },
       commitPreparedTurn: { client: false, undoable: false, move: ({ G, ctx, playerID, events }, command: CommitPreparedTurnCommand) => {

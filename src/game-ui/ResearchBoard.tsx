@@ -3,6 +3,7 @@ import { SymbolIcon, TileArt } from '../components';
 import { LABELS } from '../game/catalog';
 import { LEVEL_STARTS, MAX_RESEARCH, levelAt, priceOf } from '../game/engine';
 import type { GameState, Tile, Track } from '../game/types';
+import type { Availability } from '../game/presentation';
 
 export function priceReason(G: GameState, tile: Tile) {
   const difference = tile.level - levelAt(G.research[tile.track]);
@@ -17,10 +18,10 @@ function markerTop(position: number) {
   return (6 - level + 1 - (step + .5) / (level + 1)) / 6 * 100;
 }
 
-export default function ResearchBoard({ G, selected, active, focused, onSelect, onResearch, markers = [
+export default function ResearchBoard({ G, selected, active, focused, onSelect, onResearch, availability, showAvailability, markers = [
   { id: 'nation-energy', label: 'Votre nation', track: 'energy', position: G.research.energy },
   { id: 'nation-ecology', label: 'Votre nation', track: 'ecology', position: G.research.ecology },
-] }: { G: GameState; selected?: string; active: boolean; focused: boolean; onSelect: (tile: Tile) => void; onResearch: (track: Track) => void; markers?: ResearchMarker[] }) {
+] }: { G: GameState; selected?: string; active: boolean; focused: boolean; onSelect: (tile: Tile) => void; onResearch: (track: Track) => void; markers?: ResearchMarker[]; availability: Record<string, Availability>; showAvailability: boolean }) {
   return <section className={`research-board ${focused ? 'board-focused' : ''}`} aria-label="Plateau de recherche et technologies">
     <header className="board-caption"><div><span className="eyebrow">LES TECHNOLOGIES</span><h2>Inventer demain</h2></div><span className="board-note">Le prix suit votre recherche</span></header>
     <div className="research-headings">{(['energy', 'ecology'] as Track[]).map(track => <button key={track} className={`research-advance symbol-${track}`} disabled={!active || G.research[track] === MAX_RESEARCH} aria-label={`Rechercher en ${LABELS[track].toLowerCase()} : avancer d’une case`} onClick={() => onResearch(track)}>
@@ -32,8 +33,8 @@ export default function ResearchBoard({ G, selected, active, focused, onSelect, 
           const tiles = G.catalog.filter(t => G.market.includes(t.id) && t.track === track && t.level === level);
           return <div className={`technology-row ${track}`} key={track} aria-label={`${LABELS[track]} · niveau ${level}`}>
             <span className="row-price">{priceOf(G, { level, track } as Tile)} €</span>
-            <div className="technology-fan" style={{ '--tile-count': Math.max(1, tiles.length) } as CSSProperties}>{tiles.map(tile => <button key={tile.id} data-tile-id={tile.id} className={`board-technology cat-${tile.category} ${selected === tile.id ? 'selected' : ''} ${priceOf(G, tile) > G.money ? 'unaffordable' : ''}`} aria-label={`${tile.name}, ${priceOf(G, tile)} euros`} aria-pressed={selected === tile.id} title={`${tile.name} · ${priceOf(G, tile)} € — ${priceReason(G, tile)}`} onClick={() => onSelect(tile)}>
-              <TileArt tile={tile} /><span className="technology-name">{tile.name}</span>{tile.id === G.current && <span className="new-technology">NOUVELLE</span>}
+            <div className="technology-fan" style={{ '--tile-count': Math.max(1, tiles.length) } as CSSProperties}>{tiles.map(tile => <button key={tile.id} data-tile-id={tile.id} className={`board-technology ${showAvailability ? `availability-${availability[tile.id].state}` : ''} cat-${tile.category} ${selected === tile.id ? 'selected' : ''} ${priceOf(G, tile) > G.money ? 'unaffordable' : ''}`} aria-label={`${tile.name}, ${priceOf(G, tile)} euros`} aria-pressed={selected === tile.id} title={`${tile.name} · ${priceOf(G, tile)} € — ${priceReason(G, tile)}`} onClick={() => onSelect(tile)}>
+              <TileArt tile={tile} /><span className="technology-name">{tile.name}</span>{tile.id === G.current && <span className="new-technology">NOUVELLE</span>}{showAvailability && <span className={`market-availability ${availability[tile.id].state}`} aria-label={availability[tile.id].label} title={availability[tile.id].reason}>{availability[tile.id].state === 'now' ? '✓' : availability[tile.id].state === 'later' ? '2' : '—'}</span>}
             </button>)}</div>
           </div>;
         })}
@@ -44,6 +45,6 @@ export default function ResearchBoard({ G, selected, active, focused, onSelect, 
         {markers.filter(m => m.track === track).map((marker, i) => <span key={marker.id} data-testid={`marker-${marker.id}`} className={`research-pawn symbol-${track} ${marker.playerNumber ? `nation-color-${marker.playerNumber - 1}` : ''}`} style={{ top: `${markerTop(marker.position)}%`, marginLeft: marker.playerNumber ? (i % 2) * 10 - 5 : i * 7, marginTop: marker.playerNumber ? Math.floor(i / 2) * 12 - 6 : 0 }} role="img" title={`${marker.label} · ${LABELS[track]} · case ${marker.position + 1}`} aria-label={`${marker.label} · ${LABELS[track]} · niveau ${levelAt(marker.position)}, case ${marker.position + 1}`}>{marker.playerNumber ?? <SymbolIcon name={track} size={12} />}</span>)}
       </div>)}</div>
     </div>
-    <p className="research-footnote">Un pion avance d’une case par action. Cliquez sur une tuile pour préparer son achat.</p>
+    <p className="research-footnote">{showAvailability ? '✓ Disponible · 2 En deux actions · — Plus tard. Cliquez pour examiner.' : 'Cliquez sur une technologie pour examiner son prix et ses effets.'}</p>
   </section>;
 }

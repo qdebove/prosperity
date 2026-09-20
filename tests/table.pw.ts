@@ -41,12 +41,14 @@ test('remplacement et transport : aperçu exact, ouverture des accès et annulat
   await expect(details).toContainText('Même niveau que votre recherche');
   await expect(details.locator('tr').filter({ hasText: 'Énergie' })).toContainText('3');
   await page.getByTestId('slot-a1').click();
+  await page.getByRole('button', { name: /^(Construire|Remplacer) en A1$/ }).click();
   await expect(page.getByTestId('slot-a1')).toContainText('Centrale au fioul');
   await page.getByRole('button', { name: 'Annuler la dernière action' }).click();
   await expect(page.getByTestId('slot-a1')).toContainText('Centrale à charbon');
   await expect(page.getByTestId('slot-d1')).toHaveClass(/locked/);
   await page.getByRole('button', { name: 'Transports intégrés, 500 euros', exact: true }).click();
   await page.getByTestId('slot-c1').click();
+  await page.getByRole('button', { name: /^(Construire|Remplacer) en C1$/ }).click();
   await expect(page.getByTestId('slot-d1')).toHaveClass(/newly-unlocked/);
   await page.getByRole('button', { name: 'Annuler la dernière action' }).click();
   await expect(page.getByTestId('slot-d1')).toHaveClass(/locked/);

@@ -16,7 +16,13 @@ async function enterActions(pages: Page[], active: number) {
     }
   }
   await expect(pages[active].locator('.network-table')).toHaveAttribute('data-phase', 'actions');
-  const continueButton = pages[active].getByRole('button', { name: 'Jouer mes deux actions' });
+  await expect(pages[active].locator('.revealing')).toHaveCount(0);
+  const publicTallies = await pages[active].locator('.decade-tracker').textContent();
+  for (const page of pages) {
+    await expect(page.locator('.decade-tracker')).toHaveText(publicTallies!);
+    await expect(page.locator('.tally-scope')).toContainText('Toutes les nations');
+  }
+  const continueButton = pages[active].getByRole('button', { name: 'Continuer vers mes actions' });
   if (await continueButton.isVisible()) await continueButton.click();
   await expect(pages[active].getByRole('button', { name: /Revenus :/ })).toBeEnabled();
 }
@@ -56,13 +62,14 @@ test('trois navigateurs : salon, préparation privée, annulation, commit et rec
     await actor.getByRole('button', { name: /Revenus :/ }).click();
     await expect(observer.getByTestId('money-preview')).toHaveText(officialMoney!);
     await expect(observer.locator('.network-table')).toHaveAttribute('data-revision', revision!);
-    await expect(observer.getByRole('button', { name: /Revenus :/ })).toBeDisabled();
+    await expect(observer.getByRole('button', { name: /Revenus :/ })).toHaveCount(0);
     await actor.reload();
     await expect(actor.getByRole('button', { name: 'Valider le tour', exact: true })).toBeEnabled();
     await actor.getByRole('button', { name: 'Annuler la dernière action', exact: true }).click();
-    await expect(actor.getByRole('button', { name: 'Valider le tour', exact: true })).toBeDisabled();
+    await expect(actor.getByRole('button', { name: 'Valider le tour', exact: true })).toHaveCount(0);
     await actor.getByRole('button', { name: 'Centrale au fioul, 100 euros', exact: true }).click();
     await actor.getByTestId('slot-b1').click();
+    await actor.getByRole('button', { name: /^(Construire|Remplacer) en B1$/ }).click();
     await expect(actor.getByTestId('slot-b1')).toContainText('Centrale au fioul');
     await expect(observer.getByTestId('slot-b1')).not.toContainText('Centrale au fioul');
     await expect(observer.locator('.network-table')).toHaveAttribute('data-revision', revision!);

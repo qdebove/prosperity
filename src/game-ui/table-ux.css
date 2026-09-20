@@ -1,0 +1,163 @@
+/* Turn hierarchy, shared by the solo table and the authoritative network view. */
+.play-table { grid-template-rows: 104px minmax(0, 1fr) minmax(108px, auto); }
+.table-status { gap: 22px; }
+.decade-clock { flex: 0 0 auto; }
+.decade-tracker { display: flex; gap: 7px; margin-top: 3px; }
+.decade-tracker > span { display: inline-flex; align-items: center; gap: 3px; font-size: 9px; color: #4e6053; }
+.decade-tracker .done { color: #234b3d; font-weight: 700; }
+.decade-caption { display: block; color: #596858; font-size: 8px; margin-top: 3px; }
+.table-status .learning-toggle { margin-left: -12px; }
+.table-status .sound-toggle { margin-left: -16px; }
+.phase-heading { margin: 14px 0 17px; }
+.phase-heading .eyebrow { font-size: 9px; color: #52624f; letter-spacing: 1px; }
+.phase-heading h2 { font-size: 28px; line-height: 1.08; margin-top: 6px; }
+.turn-sequence li { font-size: 10px; }
+.turn-sequence li small { font-size: 8px; font-weight: 400; }
+.turn-sequence li.done > span { background: #d4dfc6; color: #315542; border-color: #7c9270; }
+.context-instruction { border-top: 1px solid #b9b99c; padding-top: 18px; }
+.context-instruction h3 { font-family: 'Libre Caslon Display', Georgia, serif; font-size: 23px; font-weight: 400; }
+.context-instruction p { font-size: 12px; line-height: 1.65; margin-top: 9px; color: #435743; }
+.context-instruction .private-plan { font-size: 10px; color: #52624f; margin-top: 18px; }
+.learning-note { border-left: 2px solid #9d884e; padding: 9px 11px; margin-top: 18px; background: #e5e3cf; }
+.learning-note > span { font-size: 8px; letter-spacing: 1px; color: #665c39; }
+.learning-note p { font-size: 11px; line-height: 1.5; margin: 4px 0; }
+.learning-note .text-button { min-height: 32px; padding: 5px 0; font-size: 11px; color: #234b3d; text-decoration: underline; }
+.price-learning { margin-top: 8px; }
+.revealed-technology { padding-bottom: 10px; }
+.revealed-technology strong { font-size: 13px; }
+.revealed-technology .category-label { font-size: 9px; margin-top: 5px; }
+.revealed-technology small { font-size: 10px; }
+.revealed-effects { margin-bottom: 12px; }
+.tally-results { list-style: none; padding: 0; margin: 9px 0 0; }
+.tally-results li { padding-block: 5px; font-size: 11px; line-height: 1.5; border-top: 1px solid #b9bfa760; }
+.tally-scene .tally-basis, .tally-scene .tally-scope { font-size: 10px; }
+.tally-scene .tally-scope { color: #53664e; }
+.turn-waiting { margin: 10px 0; font-size: 12px; line-height: 1.5; }
+.table-resolution label, .table-resolution > strong, .table-resolution p { font-size: 12px; }
+.table-resolution input { min-height: 44px; }
+.turn-dock { gap: 18px; padding-block: 10px; }
+.action-state { min-width: 145px; }
+.action-state strong { font-size: 12px; }
+.action-state small { font-size: 9px; }
+.action-tokens > span { display: flex; align-items: center; justify-content: center; color: #234b3d; font-size: 12px; font-weight: 600; }
+.action-tokens > .available { color: #fff; background: #496548; border-color: #34553b; box-shadow: inset 0 0 0 3px #6d825d, 0 3px 0 #34553b; }
+.dock-center { flex: 1; min-width: 0; }
+.table-actions { gap: 10px; }
+.table-actions > button { min-height: 50px; flex: 1; justify-content: center; padding: 8px 12px; background: #e2e6d4; border-color: #aeb89b; }
+.table-actions > button > span { font-size: 12px; }
+.table-actions small { font-size: 10px; color: #4d6048; }
+.dock-guidance { font-size: 12px; line-height: 1.5; color: #4a5d4e; max-width: 500px; }
+.action-feedback { color: #31583c; font-size: 11px; line-height: 1.45; margin-top: 6px; animation: resource-settle .2s ease-out; }
+.turn-validation { justify-content: flex-end; min-width: 170px; }
+.progress-button { min-height: 46px; font-size: 12px; max-width: 225px; }
+.next-action { font-size: 15px; font-weight: 500; color: #315542; }
+.plan-rollback .icon-button { min-height: 40px; min-width: 32px; }
+.play-slot.chosen { outline: 3px solid #294f35; outline-offset: 4px; }
+.play-slot.chosen .placement-label::before { content: '✓ '; }
+.physical-pollution .pollution-warning { color: #824029; font-weight: 500; font-size: 10px; }
+.market-availability { position: absolute; bottom: -4px; right: -3px; width: 17px; height: 17px; display: grid; place-items: center; border: 1px solid #536b4f; border-radius: 50%; background: #eff1e4; color: #31553c; font-size: 10px; font-weight: 700; z-index: 3; }
+.market-availability.later { border-style: dashed; color: #705921; border-color: #927538; }
+.market-availability.unavailable { border-color: #959b88; color: #52614d; }
+.board-technology.availability-unavailable:not(.selected) { filter: saturate(.55); }
+.board-technology.availability-now { border-color: #527349; }
+.technology-details { border-top: 1px solid #aeb99e; }
+.technology-details .detail-identity h3 { font-size: 15px; }
+.technology-details .detail-identity > .tile-art { width: 100px; height: 100px; }
+.technology-details.inspecting .detail-identity > .tile-art { width: 160px; height: 160px; }
+.detail-level, .context-price > span { font-size: 11px; }
+.context-price small { font-size: 10px; }
+.price-breakdown, .valid-locations { color: #4e604a; font-size: 11px; line-height: 1.5; margin: 8px 0; }
+.technology-details .tile-stats { margin-block: 8px; }
+.replacement-preview { font-size: 11px; padding-top: 4px; }
+.preview-caption { font-size: 10px; margin: 10px 0 5px; }
+.purchase-preview { font-size: 11px; }
+.purchase-preview thead { font-size: 10px; }
+.purchase-preview th, .purchase-preview td { padding-block: 5px; }
+.purchase-hint { font-size: 11px; line-height: 1.5; margin: 10px 0; }
+.purchase-confirm { display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; margin-top: 12px; border: 1px solid #526e48; border-radius: 3px; background: #dce5ce; color: #254b36; font-size: 12px; }
+.purchase-confirm:hover { background: #cbdabc; }
+.private-purchase { font-size: 9px; color: #4b6248; margin-top: 6px; }
+.slot-choices { display: flex; gap: 7px; flex-wrap: wrap; margin-block: 8px; }
+.slot-choices button { min-width: 40px; min-height: 36px; font-size: 11px; color: #315542; background: transparent; border: 1px solid #a4b290; border-radius: 3px; }
+.slot-choices button[aria-pressed=true] { background: #315542; color: #fff8e7; }
+.play-table button:focus-visible, .play-table input:focus-visible { outline: 3px solid #345f75; outline-offset: 3px; }
+@media (min-width: 1650px) {
+  .table-surface { grid-template-columns: minmax(360px, 1fr) minmax(550px, 1.45fr) minmax(295px, .72fr); gap: 30px; padding-block: 22px; }
+  .phase-heading h2 { font-size: 33px; }
+  .turn-sequence { margin-bottom: 20px; }
+  .table-actions { gap: 18px; }
+}
+@media (min-width: 901px) and (max-width: 1200px) {
+  .table-status { gap: 15px; }
+  .table-brand { display: none; }
+  .decade-clock { flex: 1; }
+  .table-actions { gap: 4px; }
+  .table-actions > button { padding-inline: 6px; gap: 5px; }
+  .table-actions > button > span { font-size: 10px; }
+  .table-actions small { font-size: 9px; }
+  .turn-validation { min-width: 130px; }
+  .action-state { min-width: 125px; }
+  .phase-heading h2 { font-size: 25px; }
+}
+@media (min-width: 901px) and (max-height: 820px) {
+  .play-table { grid-template-rows: 92px minmax(0, 1fr) minmax(102px, auto); }
+  .table-surface { padding-block: 12px; }
+  .phase-heading { margin-block: 10px 12px; }
+  .phase-heading h2 { font-size: 25px; }
+  .learning-note { margin-top: 10px; }
+  .revealed-technology > .tile-art { width: 55px; height: 55px; flex-basis: 55px; }
+  .technology-details .detail-identity > .tile-art { width: 72px; height: 72px; }
+}
+@media (max-width: 900px) {
+  .table-status { height: 108px; gap: 15px; }
+  .table-brand { display: none; }
+  .decade-clock { flex: 1; }
+  .table-context { flex-wrap: wrap; }
+  .context-instruction { flex: 1; min-width: 180px; }
+  .learning-note { flex-basis: 100%; margin-top: 0; }
+  .turn-dock { grid-template-columns: 1fr auto; gap: 8px; }
+  .dock-center { grid-column: 1 / -1; grid-row: 1; }
+  .table-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .table-actions > button { padding: 7px; }
+  .turn-validation { min-width: 0; }
+  .progress-button { max-width: none; min-height: 44px; font-size: 12px; }
+  .action-feedback { font-size: 10px; }
+  .dock-guidance { max-width: none; font-size: 11px; }
+  .phase-heading h2 { font-size: 27px; }
+}
+@media (max-width: 560px) {
+  .table-status { position: relative; height: 120px; padding-bottom: 40px; gap: 9px; }
+  .decade-clock { display: contents; }
+  .decade-tracker { position: absolute; bottom: 20px; left: 0; right: 0; justify-content: center; gap: 14px; }
+  .decade-caption { position: absolute; bottom: 5px; left: 0; right: 0; text-align: center; }
+  .table-status .learning-toggle, .table-status .sound-toggle { margin-left: 0; }
+  .table-status > .icon-button { min-width: 27px; min-height: 40px; padding: 0; }
+  .table-year strong { font-size: 23px; }
+  .table-resource { gap: 3px; }
+  .table-resource > svg { display: none; }
+  .table-context { gap: 8px; }
+  .turn-flow { width: 100%; }
+  .draw-scene { padding: 3px; }
+  .phase-heading { margin-top: 8px; }
+  .context-instruction { padding-top: 12px; }
+  .table-actions > button { gap: 4px; min-height: 48px; padding: 6px 3px; }
+  .table-actions > button > span { font-size: 11px; }
+  .table-actions small { font-size: 9px; }
+  .action-state strong { font-size: 11px; }
+  .action-state small { font-size: 8px; }
+  .action-tokens > span { width: 20px; height: 20px; }
+  .turn-validation { gap: 2px; }
+  .progress-button { max-width: 180px; padding: 8px 10px; font-size: 11px; }
+  .plan-rollback .icon-button { min-width: 27px; }
+  .next-action { font-size: 12px; }
+  .slot-choices button { min-width: 44px; min-height: 44px; }
+  .technology-details { scroll-margin-top: 12px; }
+}
+@media (max-width: 360px) {
+  .table-actions > button > svg { display: none; }
+  .action-state { min-width: 0; }
+  .action-tokens { gap: 3px; }
+  .progress-button { max-width: 148px; font-size: 10px; }
+  .plan-rollback .icon-button { min-width: 24px; width: 24px; }
+}
+@media (prefers-reduced-motion: reduce) { .action-feedback { animation: none; } }

@@ -20,8 +20,8 @@ try {
   await page.locator('.revealing').waitFor({ state: 'detached' });
   const resolve = page.getByRole('button', { name: 'Valider', exact: true });
   if (await resolve.isVisible()) await resolve.click();
-  await page.getByRole('button', { name: 'Jouer mes deux actions' }).click();
+  await page.getByRole('button', { name: 'Continuer vers mes actions' }).click();
   await page.getByRole('button', { name: 'Centrale au fioul, 100 euros' }).click();
-  await page.getByTestId('slot-a1').hover();
+  await page.getByTestId('slot-a1').click();
   await page.screenshot({ path: '.artifacts/table-purchase.jpg' });
 } finally { await browser.close(); }

@@ -6,6 +6,7 @@ import type { GameState, PlannedAction, Stats, Symbol, Tile, Track } from './typ
 export const LEVEL_STARTS = [0, 2, 5, 9, 14, 20];
 export const MAX_RESEARCH = 26;
 export const POLLUTION_LIMIT = 16;
+export const TALLY_RATES = { energy: 50, ecology: 50, capital: 100 } as const;
 export const FINAL_STEPS: Symbol[] = ['energy', 'energy', 'ecology', 'ecology', 'capital', 'research', 'prosperity'];
 export const levelAt = (position: number) => LEVEL_STARTS.filter(start => position >= start).length;
 export const pollutionBonus = (pollution: number) => [1, 6, 11].filter(space => pollution < space).length;
@@ -60,17 +61,17 @@ export function tally(G: GameState, symbol: Symbol, researchRanking = false) {
   const kind = G.finalStep >= 0 ? 'final' : 'event';
   if (symbol === 'energy') {
     if (s.energy < 0) { G.pending = -s.energy; G.phase = 'energy'; return; }
-    G.money += s.energy * 50;
-    log(G, `Énergie : +${s.energy * 50} €.`, kind);
+    G.money += s.energy * TALLY_RATES.energy;
+    log(G, `Énergie : +${s.energy * TALLY_RATES.energy} €.`, kind);
   } else if (symbol === 'ecology') {
     const excess = Math.max(0, s.ecology - G.pollution);
     const before = G.pollution;
     G.pollution = Math.max(0, G.pollution - s.ecology);
-    G.money += excess * 50;
-    log(G, `Écologie : ${G.pollution - before > 0 ? '+' : ''}${G.pollution - before} pollution${excess ? `, +${excess * 50} €` : ''}.`, kind);
+    G.money += excess * TALLY_RATES.ecology;
+    log(G, `Écologie : ${G.pollution - before > 0 ? '+' : ''}${G.pollution - before} pollution${excess ? `, +${excess * TALLY_RATES.ecology} €` : ''}.`, kind);
   } else if (symbol === 'capital') {
-    G.money += s.capital * 100;
-    log(G, `Capital : +${s.capital * 100} €.`, kind);
+    G.money += s.capital * TALLY_RATES.capital;
+    log(G, `Capital : +${s.capital * TALLY_RATES.capital} €.`, kind);
     if (G.finalStep >= 0) {
       const amount = points(G, Math.floor(G.money / 300));
       G.money %= 300;
@@ -196,7 +197,7 @@ export function createGame(catalog: Tile[] = BASE_CATALOG, seed = 'prosperity', 
           G.actions = 2;
           const tile = G.catalog.find(t => t.id === G.current)!;
           G.market.push(tile.id);
-          log(G, `${tile.decade} · ${tile.name}. Décompte : ${LABELS[tile.tally].toLowerCase()}.`, 'event');
+          G.log.push({ turn: G.turn, text: `${tile.decade} · ${tile.name}. Décompte : ${LABELS[tile.tally].toLowerCase()}.`, kind: 'event', revealedTileId: tile.id });
           tally(G, tile.tally);
         },
       },

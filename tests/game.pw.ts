@@ -13,6 +13,7 @@ test('desktop: plateau, achat, sauvegarde et atelier', async ({ page }) => {
   await page.getByRole('button', { name: /Revenus/ }).click();
   await page.getByRole('button', { name: 'Centrale au fioul, 100 euros', exact: true }).click();
   await page.getByTestId('slot-b1').click();
+  await page.getByRole('button', { name: /^(Construire|Remplacer) en B1$/ }).click();
   await expect(page.getByTestId('slot-b1')).toContainText('Centrale au fioul');
   let staged = await page.evaluate(() => JSON.parse(localStorage.getItem('prosperity.game.v1')!));
   expect(staged.board.b1).toBeNull();
@@ -23,9 +24,10 @@ test('desktop: plateau, achat, sauvegarde et atelier', async ({ page }) => {
   await expect(page.getByTestId('slot-b1')).toContainText('Centrale au fioul');
   await page.getByRole('button', { name: 'Annuler la dernière action', exact: true }).click();
   await expect(page.getByTestId('slot-b1')).not.toContainText('Centrale au fioul');
-  await expect(page.getByRole('button', { name: 'Valider le tour', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Valider le tour', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Centrale au fioul, 100 euros', exact: true }).click();
   await page.getByTestId('slot-b1').click();
+  await page.getByRole('button', { name: /^(Construire|Remplacer) en B1$/ }).click();
   await page.getByRole('button', { name: 'Valider le tour', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Tour suivant', exact: true })).toBeEnabled();
   staged = await page.evaluate(() => JSON.parse(localStorage.getItem('prosperity.game.v1')!));
@@ -66,7 +68,7 @@ test('mobile: affichage sans débordement, navigation et actions', async ({ page
   await page.screenshot({ path: '.artifacts/mobile-planned.jpg', fullPage: true });
   await page.getByRole('button', { name: 'Annuler les deux actions' }).click();
   await expect(page.getByTestId('pollution-preview')).toHaveText(`${before.pollution}`);
-  await expect(page.getByRole('button', { name: 'Valider le tour', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Valider le tour', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Rechercher en écologie : avancer d’une case' }).click();
   await expect(page.getByRole('region', { name: 'Plateau de recherche et technologies' })).toBeVisible();
   await page.getByRole('button', { name: /Revenus/ }).click();
@@ -204,6 +206,7 @@ test('illustration personnalisée: cinq symboles, aperçu, export et partie', as
   await enterActions(page);
   await card.click();
   await page.getByTestId('slot-a2').click();
+  await page.getByRole('button', { name: /^(Construire|Remplacer) en A2$/ }).click();
   const placed = page.getByTestId('slot-a2');
   await expect(placed.locator('.art-symbol')).toHaveCount(5);
   for (const width of [320, 390, 768, 1440]) {
