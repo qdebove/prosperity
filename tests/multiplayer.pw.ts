@@ -1,4 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
+import { openResearch, openNation } from './ui';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { BASE_CATALOG } from '../src/game/catalog';
 
 async function enterActions(pages: Page[], active: number) {
@@ -20,7 +22,9 @@ async function enterActions(pages: Page[], active: number) {
   const publicTallies = await pages[active].locator('.decade-tracker').textContent();
   for (const page of pages) {
     await expect(page.locator('.decade-tracker')).toHaveText(publicTallies!);
+    if (!await page.getByRole('dialog').isVisible()) await page.getByRole('button', { name: 'Consulter les décomptes' }).click();
     await expect(page.locator('.tally-scope')).toContainText('Toutes les nations');
+    if (page !== pages[active]) await page.getByRole('dialog').getByRole('button', { name: 'Fermer', exact: true }).click();
   }
   const continueButton = pages[active].getByRole('button', { name: 'Continuer vers mes actions' });
   if (await continueButton.isVisible()) await continueButton.click();
@@ -54,10 +58,26 @@ test('trois navigateurs : salon, préparation privée, annulation, commit et rec
     await enterActions(pages, active);
     const actor = pages[active]; const observer = pages[(active + 1) % 3];
     const actorName = ['Alice', 'Bob', 'Charlie'][active];
+    await actor.getByRole('navigation', { name: 'Vues de la partie' }).getByRole('button', { name: 'Comparaison', exact: true }).click();
+    await expect(actor.locator('.nation-comparisons article')).toHaveCount(3);
+    mkdirSync('.artifacts/guide', { recursive: true });
+    for (const [id, width, height] of [['C22', 1366, 768], ['C23', 390, 844]] as const) {
+      await actor.setViewportSize({ width, height });
+      await actor.screenshot({ path: `.artifacts/guide/${id}-viewport.png` });
+      const fullHeight = await actor.evaluate(() => document.documentElement.scrollHeight);
+      await actor.setViewportSize({ width, height: fullHeight });
+      await actor.evaluate(() => window.scrollTo(0, 0));
+      await actor.screenshot({ path: `.artifacts/guide/${id}.png`, fullPage: true });
+      writeFileSync(`.artifacts/guide/${id}.json`, JSON.stringify({ id, description: 'Comparaison de trois nations réelles : Alice, Bob et Charlie', viewport: { width, height: fullHeight }, referenceViewport: { width, height }, fullPage: true, source: 'tests/multiplayer.pw.ts', displayed: await actor.locator('.comparison-board').innerText() }, null, 2));
+    }
+    await actor.setViewportSize({ width: 1440, height: 1000 });
+    await openNation(actor);
+
     await observer.getByRole('combobox', { name: 'Nation à consulter' }).selectOption(String(active));
     const officialMoney = await observer.getByTestId('money-preview').textContent();
     const revision = await observer.locator('.network-table').getAttribute('data-revision');
     const sentBefore = sent[active].filter(packet => packet.includes('"update"')).length;
+    await openResearch(actor);
     await actor.getByRole('button', { name: 'Rechercher en énergie : avancer d’une case' }).click();
     await actor.getByRole('button', { name: /Revenus :/ }).click();
     await expect(observer.getByTestId('money-preview')).toHaveText(officialMoney!);
@@ -67,8 +87,9 @@ test('trois navigateurs : salon, préparation privée, annulation, commit et rec
     await expect(actor.getByRole('button', { name: 'Valider le tour', exact: true })).toBeEnabled();
     await actor.getByRole('button', { name: 'Annuler la dernière action', exact: true }).click();
     await expect(actor.getByRole('button', { name: 'Valider le tour', exact: true })).toHaveCount(0);
+    await openResearch(actor);
     await actor.getByRole('button', { name: 'Centrale au fioul, 100 euros', exact: true }).click();
-    await actor.getByTestId('slot-b1').click();
+    await actor.getByRole('button', { name: 'Prévisualiser en B1' }).click();
     await actor.getByRole('button', { name: /^(Construire|Remplacer) en B1$/ }).click();
     await expect(actor.getByTestId('slot-b1')).toContainText('Centrale au fioul');
     await expect(observer.getByTestId('slot-b1')).not.toContainText('Centrale au fioul');
@@ -79,7 +100,9 @@ test('trois navigateurs : salon, préparation privée, annulation, commit et rec
     await expect(observer.getByTestId('slot-b1')).toContainText('Centrale au fioul');
     await expect(observer.getByRole('complementary', { name: 'Dernier tour validé' })).toContainText(`${actorName} a validé`);
     await expect(observer.locator('.committed-replay li.visible')).toHaveCount(2);
+    await openResearch(observer);
     await expect(observer.getByTestId('marker-' + active + '-energy')).toHaveAttribute('aria-label', /case 2/);
+    await openNation(observer);
     const next = (active + 1) % 3;
     await expect(observer.getByTestId('active-player')).toHaveAttribute('data-player-id', String(next));
     // Restore an obsolete local draft: reload must discard it, without replaying.

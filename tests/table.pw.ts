@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { enterActions } from './ui';
+import { enterActions, openResearch, openNation } from './ui';
 
 async function start(page: Page) {
   await page.goto('/');
@@ -10,18 +10,19 @@ async function start(page: Page) {
 test('deux recherches déplacent le pion, changent les prix et restent annulables', async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
   await start(page);
+  await openResearch(page);
   const marker = page.getByTestId('marker-nation-energy');
-  const original = await marker.getAttribute('style');
+  const original = await marker.getAttribute('data-position');
   await page.getByRole('button', { name: 'Recherche +1 case', exact: true }).click();
-  await expect(page.locator('.play-table')).toHaveClass(/focus-research/);
+  await expect(page.locator('.play-table')).toHaveClass(/view-research/);
   await page.getByRole('button', { name: 'Rechercher en énergie : avancer d’une case' }).click();
-  await expect(marker).not.toHaveAttribute('style', original!);
+  await expect(marker).not.toHaveAttribute('data-position', original!);
   await expect(page.locator('.action-tokens .available')).toHaveCount(1);
   await page.getByRole('button', { name: 'Rechercher en énergie : avancer d’une case' }).click();
   await expect(page.locator('.action-tokens .available')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Centrale au fioul, 50 euros', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Annuler les deux actions' }).click();
-  await expect(marker).toHaveAttribute('style', original!);
+  await expect(marker).toHaveAttribute('data-position', original!);
   await expect(page.locator('.action-tokens .available')).toHaveCount(2);
 });
 
@@ -34,20 +35,22 @@ test('remplacement et transport : aperçu exact, ouverture des accès et annulat
   });
   await page.reload();
   await enterActions(page);
+  await openResearch(page);
   await page.getByRole('button', { name: 'Centrale au fioul, 100 euros', exact: true }).click();
-  await page.getByTestId('slot-a1').hover();
+  await page.getByRole('button', { name: 'Prévisualiser en A1' }).click();
   const details = page.getByRole('region', { name: 'Détails de la technologie' });
   await expect(details).toContainText('Centrale à charbon');
   await expect(details).toContainText('Même niveau que votre recherche');
   await expect(details.locator('tr').filter({ hasText: 'Énergie' })).toContainText('3');
-  await page.getByTestId('slot-a1').click();
+  await page.getByRole('button', { name: 'Prévisualiser en A1' }).click();
   await page.getByRole('button', { name: /^(Construire|Remplacer) en A1$/ }).click();
   await expect(page.getByTestId('slot-a1')).toContainText('Centrale au fioul');
   await page.getByRole('button', { name: 'Annuler la dernière action' }).click();
   await expect(page.getByTestId('slot-a1')).toContainText('Centrale à charbon');
   await expect(page.getByTestId('slot-d1')).toHaveClass(/locked/);
+  await openResearch(page);
   await page.getByRole('button', { name: 'Transports intégrés, 500 euros', exact: true }).click();
-  await page.getByTestId('slot-c1').click();
+  await page.getByRole('button', { name: 'Prévisualiser en C1' }).click();
   await page.getByRole('button', { name: /^(Construire|Remplacer) en C1$/ }).click();
   await expect(page.getByTestId('slot-d1')).toHaveClass(/newly-unlocked/);
   await page.getByRole('button', { name: 'Annuler la dernière action' }).click();
@@ -74,26 +77,22 @@ test('pollution au-delà de la piste et symbole découvert sans plafonner les r�
   await expect(page.getByTestId('pollution-preview')).toHaveText('17');
 });
 
-test('la table reste dans le viewport aux quatre résolutions, même en fin de partie', async ({ page }) => {
+test('catalogue complet : défilement naturel et cartes lisibles aux quatre résolutions', async ({ page }) => {
   await page.goto('/');
-  // A valid late-game state with all revealed technologies exercises crowded levels.
   await page.evaluate(() => {
     const G = JSON.parse(localStorage.getItem('prosperity.game.v1')!);
     G.market = G.catalog.map((t: { id: string }) => t.id);
     G.deck = []; G.turn = 36; G.current = '2030-5'; G.phase = 'actions'; G.actions = 2;
     localStorage.setItem('prosperity.game.v1', JSON.stringify(G));
   });
-  await page.reload();
-  await enterActions(page);
+  await page.reload(); await enterActions(page); await openResearch(page);
   for (const [width, height] of [[1366, 768], [1440, 900], [1920, 1080], [2560, 1440]]) {
     await page.setViewportSize({ width, height });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth && document.documentElement.scrollHeight <= innerHeight)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await expect(page.locator('.board-technology')).toHaveCount(60);
-    const inaccessible = await page.locator('.board-technology').evaluateAll(tiles => tiles.some(tile => {
-      const r = tile.getBoundingClientRect();
-      return r.width < 16 || r.height < 16 || r.bottom > innerHeight || r.top < 0;
-    }));
-    expect(inaccessible, `${width} × ${height}`).toBe(false);
-    await page.screenshot({ path: `.artifacts/table-late-${width}.jpg` });
+    expect(await page.locator('.board-technology').evaluateAll(tiles => tiles.every(tile => { const r = tile.getBoundingClientRect(); return r.width >= 100 && r.height >= 100; }))).toBe(true);
+    await page.locator('.board-technology').last().scrollIntoViewIfNeeded();
+    await expect(page.locator('.board-technology').last()).toBeInViewport();
+    await page.screenshot({ path: `.artifacts/table-late-${width}.jpg`, fullPage: true });
   }
 });

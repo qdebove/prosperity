@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { Zap, Leaf, Coins, FlaskConical, Globe2, X, Landmark, Factory, Route, Building2, Sparkles } from 'lucide-react';
 import { CATEGORIES, LABELS } from './game/catalog';
 import type { Category, Symbol, Tile } from './game/types';
@@ -51,9 +51,25 @@ export function CategoryLabel({ category }: { category: Category }) {
 }
 export function Modal({ title, children, onClose, wide = false }: { title: string; children: ReactNode; onClose: () => void; wide?: boolean }) {
   const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => { ref.current?.showModal(); return () => ref.current?.close(); }, []);
-  return <dialog ref={ref} className={`modal ${wide ? 'wide' : ''}`} onCancel={onClose} onClick={e => { if (e.target === ref.current) onClose(); }}>
-    <div className="modal-heading"><h2>{title}</h2><button className="icon-button" onClick={onClose} aria-label="Fermer" title="Fermer"><X size={20} /></button></div>{children}
+  const titleId = useId();
+  useEffect(() => {
+    const dialog = ref.current;
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    dialog?.showModal();
+    return () => {
+      dialog?.close();
+      const destination = trigger?.isConnected ? trigger : document.querySelector<HTMLElement>('.game-views button[aria-current]');
+      destination?.focus({ preventScroll: true });
+    };
+  }, []);
+  return <dialog ref={ref} aria-labelledby={titleId} className={`modal ${wide ? 'wide' : ''}`} onKeyDown={e => {
+    if (e.key !== 'Tab') return;
+    const items = [...e.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]')].filter(el => el.getClientRects().length);
+    const first = items[0], last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+  }} onCancel={e => { e.preventDefault(); onClose(); }} onClick={e => { if (e.target === ref.current) { const r = ref.current.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose(); } }}>
+    <div className="modal-heading"><h2 id={titleId}>{title}</h2><button className="icon-button" onClick={onClose} aria-label="Fermer" title="Fermer"><X size={20} /></button></div>{children}
   </dialog>;
 }
 export function Brand() { return <span className="brand"><Landmark size={27} strokeWidth={1.4} /><span>PROSPERITY<small>LE JEU DE PLATEAU</small></span></span>; }

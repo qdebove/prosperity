@@ -10,7 +10,6 @@ import '@fontsource/libre-caslon-display/latin-400.css';
 import './styles.css';
 import './play.css';
 import './table.css';
-import './game-ui/table-ux.css';
 
 const Screen = /^\/(multiplayer|game)(\/|$)/.test(location.pathname) ? Multiplayer : App;
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><Screen /></React.StrictMode>);

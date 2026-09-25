@@ -1,0 +1,510 @@
+[
+  {
+    "file": "images/01-nation-originale.jpg",
+    "kind": "capture fournie",
+    "source": "01-1000115076.jpg",
+    "title": "Nation originale",
+    "size": [
+      1274,
+      1536
+    ]
+  },
+  {
+    "file": "images/02-pollution-originale.jpg",
+    "kind": "capture fournie",
+    "source": "02-1000115079.jpg",
+    "title": "Pollution originale",
+    "size": [
+      1536,
+      620
+    ]
+  },
+  {
+    "file": "images/03-recherche-mobile-originale.jpg",
+    "kind": "capture fournie",
+    "source": "03-1000115080.jpg",
+    "title": "Recherche originale dans un navigateur mobile",
+    "size": [
+      709,
+      1536
+    ]
+  },
+  {
+    "file": "images/04-recherche-entetes-originale.jpg",
+    "kind": "capture fournie",
+    "source": "04-1000115084.jpg",
+    "title": "En-têtes et niveau 6",
+    "size": [
+      1536,
+      600
+    ]
+  },
+  {
+    "file": "images/05-recherche-pistes-originale.jpg",
+    "kind": "capture fournie",
+    "source": "01-1000115094.jpg",
+    "title": "Pistes et jetons, niveaux 1 à 4",
+    "size": [
+      1482,
+      1536
+    ]
+  },
+  {
+    "file": "images/06-ancienne-vue-globale.png",
+    "kind": "capture fournie",
+    "source": "f1b7b6d9-20ca-4008-acdf-a517c07933a2.png",
+    "title": "Ancienne vue globale — organisation à ne pas recopier",
+    "size": [
+      1890,
+      931
+    ]
+  },
+  {
+    "file": "images/07-nation-indicateurs.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/01-nation-originale.jpg",
+    "crop": [
+      0,
+      0,
+      1274,
+      205
+    ],
+    "title": "Indicateurs de nation"
+  },
+  {
+    "file": "images/08-nation-types-de-cases.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/01-nation-originale.jpg",
+    "crop": [
+      175,
+      250,
+      1090,
+      858
+    ],
+    "title": "Cases construites, libres et catégories"
+  },
+  {
+    "file": "images/09-nation-verrouillages.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/01-nation-originale.jpg",
+    "crop": [
+      178,
+      1122,
+      1090,
+      1472
+    ],
+    "title": "Cases D1/D2 et transport requis"
+  },
+  {
+    "file": "images/10-nation-transport.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/01-nation-originale.jpg",
+    "crop": [
+      175,
+      867,
+      1090,
+      1194
+    ],
+    "title": "C1 et C3 : liaison au territoire"
+  },
+  {
+    "file": "images/11-pollution-jetons.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/02-pollution-originale.jpg",
+    "crop": [
+      76,
+      175,
+      1450,
+      334
+    ],
+    "title": "Disques de pollution"
+  },
+  {
+    "file": "images/12-pollution-pp-decouvert.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/02-pollution-originale.jpg",
+    "crop": [
+      412,
+      330,
+      612,
+      522
+    ],
+    "title": "Case de PP découverte"
+  },
+  {
+    "file": "images/13-pollution-limite.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/02-pollution-originale.jpg",
+    "crop": [
+      1285,
+      323,
+      1457,
+      518
+    ],
+    "title": "Dernière case de pollution"
+  },
+  {
+    "file": "images/14-recherche-entetes.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/04-recherche-entetes-originale.jpg",
+    "crop": [
+      30,
+      0,
+      1516,
+      185
+    ],
+    "title": "En-têtes des deux domaines"
+  },
+  {
+    "file": "images/15-recherche-niveau-six.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/04-recherche-entetes-originale.jpg",
+    "crop": [
+      32,
+      181,
+      1515,
+      588
+    ],
+    "title": "Deux tuiles par domaine au niveau 6"
+  },
+  {
+    "file": "images/16-recherche-sous-etapes.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/05-recherche-pistes-originale.jpg",
+    "crop": [
+      627,
+      0,
+      847,
+      1140
+    ],
+    "title": "Sous-étapes des niveaux 2 à 4"
+  },
+  {
+    "file": "images/17-recherche-jetons.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/05-recherche-pistes-originale.jpg",
+    "crop": [
+      606,
+      1138,
+      863,
+      1492
+    ],
+    "title": "Jetons Énergie et Écologie"
+  },
+  {
+    "file": "images/18-recherche-selection.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/05-recherche-pistes-originale.jpg",
+    "crop": [
+      352,
+      404,
+      624,
+      696
+    ],
+    "title": "Bordure de sélection d’une tuile"
+  },
+  {
+    "file": "images/19-recherche-niveau-trois.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/05-recherche-pistes-originale.jpg",
+    "crop": [
+      60,
+      392,
+      1440,
+      737
+    ],
+    "title": "Alignement d’un niveau entre les deux domaines"
+  },
+  {
+    "file": "images/20-mobile-commandes.jpg",
+    "kind": "recadrage sans retouche",
+    "source": "images/03-recherche-mobile-originale.jpg",
+    "crop": [
+      0,
+      1180,
+      709,
+      1375
+    ],
+    "title": "Anciennes commandes mobiles — référence partielle"
+  },
+  {
+    "file": "images/prosperity-live-01-nation.jpg",
+    "live_id": "L01",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-21",
+    "title": "Nation initiale",
+    "size": [
+      914,
+      936
+    ],
+    "sha256": "43ed9b348326f48f577ad178d5a491539e9f8e448d2c9d63db09e285c2f8bd51",
+    "caption": "État initial du scénario : 400 €, 12 PP, pollution 8, décompte écologie à résoudre. Vue générale conservée telle que capturée ; elle ne sert pas à mesurer le responsive."
+  },
+  {
+    "file": "images/prosperity-live-02-case-bloquee.jpg",
+    "live_id": "L02",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-21",
+    "title": "Case D1 bloquée",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "f173391a21d864d02647ae2f321b14c5e565835ff5b0362c7665e0ab0d931dff",
+    "caption": "Clic sur D1 : popup « Transport requis en C1 » et bouton vers la recherche du prérequis."
+  },
+  {
+    "file": "images/prosperity-live-03-recherche-ciblee.jpg",
+    "live_id": "L03",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-21",
+    "title": "Recherche ciblée sur C1",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "5ec4d8a3ab2a94a3440c9d46db7763e166b65cda0659f9dd0b7019396b9413c5",
+    "caption": "Après « Trouver un transport en C1 » : contexte C1 et code de compatibilité. Les cartes incompatibles restent présentes."
+  },
+  {
+    "file": "images/prosperity-live-04-recherche-milieu.jpg",
+    "live_id": "L04",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-21",
+    "title": "Recherche, milieu du catalogue",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "67ead2aa7c51c49eeb2745ac0f98941d23c597fbd175af73c9aa1e9a89ba9e8f",
+    "caption": "Défilement dans les niveaux 4 et 3. Les pistes centrales continuent le long des groupes de cartes et les options compatibles ressortent."
+  },
+  {
+    "file": "images/prosperity-live-05-popup-position.jpg",
+    "live_id": "L05",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-21",
+    "title": "Position avant avancement",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "50894f1d093888d530b70cf9b18b9f8124a610f6ed43f223e2749e5f93bbb342",
+    "caption": "Clic sur le jeton Énergie : niveau 2, case 3/3. La popup propose une seule case d’avancement."
+  },
+  {
+    "file": "images/prosperity-live-06-jetons-niveau-deux.jpg",
+    "live_id": "L06",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-21",
+    "title": "Deux jetons au niveau 2",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "f07d7dcab159959a49c75322017f4ccd8b67694ec631ffc34b3888c4610d4469",
+    "caption": "Les deux jetons sont chacun sur leur piste. Les étapes franchies sont colorées. Référence de position avant avancement."
+  },
+  {
+    "file": "images/prosperity-live-07-tuile-phase-bloquee.jpg",
+    "live_id": "L07",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-21",
+    "title": "Achat bloqué par la phase",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "613a47fc1ea53550209db41240abd1ddf1fca48e6189a774ae879ccfc57cc672",
+    "caption": "Réseau ferroviaire compatible et finançable à 100 €, mais bouton désactivé tant que le décompte n’est pas résolu. Ne pas confondre financement et autorisation d’agir."
+  },
+  {
+    "file": "images/prosperity-live-08-actions.jpg",
+    "live_id": "L08",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Nation après décompte",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "5ec1895dd58415086ea47336a909ad3522d4bb524e28cf5b95ac157d0157e88e",
+    "caption": "Le décompte écologie est marqué effectué et la barre indique deux actions disponibles."
+  },
+  {
+    "file": "images/prosperity-live-09-tuile-installee.jpg",
+    "live_id": "L09",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Détail de la tuile installée",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "c1c24e871cf785b295f265dbed04c3bfe2fc63ab31907e92b7659ed643155f1b",
+    "caption": "Popup de C1, Ceinture verte : illustration, effet +1 écologie et accès aux achats pour cette case."
+  },
+  {
+    "file": "images/prosperity-live-10-achat-disponible.jpg",
+    "live_id": "L10",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Achat disponible",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "6a7b7cd429b444e3787fb51ded7802d331663899dba7bf98b4849cb090d9e8f6",
+    "caption": "Après décompte : détail du Réseau ferroviaire et prix de 100 €. Le choix d’emplacement est actif."
+  },
+  {
+    "file": "images/prosperity-live-11-confirmation.jpg",
+    "live_id": "L11",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Confirmation du remplacement",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "bed7ac76953e70223a5b6ea58affc391db5d73281006bcb4611e76ec003e056a",
+    "caption": "Le contexte C1 est conservé. La popup nomme la tuile remplacée et prévisualise la trésorerie 400 → 300 €. Dans ce cas les effets écologiques sont identiques ; aucun delta de production non nul n’est montré."
+  },
+  {
+    "file": "images/prosperity-live-12-cases-debloquees.jpg",
+    "live_id": "L12",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Transport posé et cases débloquées",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "afc457ea91a39207fedf61cb14743b7b5f6d81b80da7c838659676f05a5d38fb",
+    "caption": "Après confirmation : C1 contient Réseau ferroviaire, D1 et D2 sont libres, trésorerie 300 €, une action restante. La pollution est encore à 8."
+  },
+  {
+    "file": "images/prosperity-live-13-depollution.jpg",
+    "live_id": "L13",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Dépollution par clic sur un disque",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "1b38356561cca81efed164aca4933e1d072399b41eb24d24b9350f8061c87304",
+    "caption": "Clic sur le disque de la case 3 : le disque 8 disparaît, la case 3 reste occupée, la pollution passe à 7 et les actions sont terminées. Pas de trou au milieu de la piste."
+  },
+  {
+    "file": "images/prosperity-live-14-comparaison.jpg",
+    "live_id": "L14",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Comparaison des nations",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "842c7493bd3c8f2a88f4de6696309596f68594ff6a6d4c794fc196fb85374d54",
+    "caption": "Classement, comparaison et tableau des équilibres. Les autres joueurs sont explicitement simulés."
+  },
+  {
+    "file": "images/prosperity-live-15-comparaison-pollution.jpg",
+    "live_id": "L15",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Comparaison par pollution",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "663c01a5e7f0eb72f845d3b81f3935b5b584a8236753b52a0166329d31e62417",
+    "caption": "Le sélecteur Pollution modifie la série du graphique ; le tableau indique 7 pour le joueur courant."
+  },
+  {
+    "file": "images/prosperity-live-16-decomptes.jpg",
+    "live_id": "L16",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Popup des décomptes",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "a292a3bb5e8183bbfad7eeffe8d9996d227686f58f22972fb843937fd45268ec",
+    "caption": "Détail de la décennie et historique des deux actions. Les explications restent dans une popup."
+  },
+  {
+    "file": "images/prosperity-live-17-fin-demo.jpg",
+    "live_id": "L17",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Fin du scénario",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "01b2027ac0bdf473bc638afec44710d43bb90672d1526a6c32192ba3c1045d00",
+    "caption": "Le scénario s’arrête après le tour. Cette restriction de démo ne doit pas être copiée dans un moteur de partie complète."
+  },
+  {
+    "file": "images/prosperity-live-18-recherche-sans-filtre.jpg",
+    "live_id": "L18",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Recherche sans filtre",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "15521a3d6b3c235f8ea9e4e531ea233dbc780f014931dbbe5bf7aeffe5e3a6b8",
+    "caption": "Après « Rejouer le scénario », résolution du décompte puis vue Recherche : deux domaines, en-têtes avec sous-étapes, niveaux et cartes non filtrées."
+  },
+  {
+    "file": "images/prosperity-live-19-progression.jpg",
+    "live_id": "L19",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Position après avancement",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "ab70207134185faf0e001808dc73eac19d6a2ee5680d964350b0a64be94b6d21",
+    "caption": "Clic sur l’en-tête Énergie, puis sur son jeton : niveau 3, case 1/4. Le niveau 2, case 3/3 est donc suivi de cette case précise."
+  },
+  {
+    "file": "images/prosperity-live-20-jetons-distincts.jpg",
+    "live_id": "L20",
+    "kind": "capture réelle du site, sans retouche",
+    "source": "https://prosperity-nations.deboveq.chatgpt.site/",
+    "session": "2026-09-23",
+    "title": "Jetons à des positions différentes",
+    "size": [
+      1348,
+      926
+    ],
+    "sha256": "db46b95e7d220f1a748ab09f92e2636872236f4e9cc1415194779b737bb6f7d0",
+    "caption": "Énergie est au niveau 3, première case ; Écologie reste au niveau 2, troisième case. La barre indique une action restante. Les hauteurs des niveaux suivent les lignes de cartes."
+  }
+]

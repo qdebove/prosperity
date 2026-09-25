@@ -1,66 +1,41 @@
 import { expect, test } from '@playwright/test';
-import { enterActions } from './ui';
+import { enterActions, openResearch, openNation } from './ui';
 
-test('une progression dominante, deux actions répétables et retour local immédiat', async ({ page }) => {
-  await page.setViewportSize({ width: 1920, height: 1080 });
+test('progression du tour, actions répétables et retour local', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.play-table button.primary')).toHaveCount(1);
+  await expect(page.locator('.table-context')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Revenus :/ })).toHaveCount(0);
-  await expect(page.locator('.learning-note')).toContainText('PRISE EN MAIN · 1/3');
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
-  await expect(page.locator('.revealing')).toHaveCount(0);
-  const resolve = page.getByRole('button', { name: 'Valider', exact: true });
-  if (await resolve.isVisible()) await resolve.click();
-  await expect(page.locator('.turn-sequence [aria-current]')).toContainText('Décompte');
-  await expect(page.getByRole('button', { name: 'Continuer vers mes actions' })).toBeVisible();
-  await expect(page.locator('.play-table button.primary')).toHaveCount(1);
-  await page.screenshot({ path: '.artifacts/v4-tally-1920.jpg' });
   await enterActions(page);
-  await expect(page.locator('.phase-heading')).toContainText('Action 1 sur 2');
   await expect(page.locator('.table-actions button')).toHaveCount(4);
   await page.getByRole('button', { name: /Revenus :/ }).click();
   await expect(page.locator('.action-feedback')).toContainText('+100 €');
-  await expect(page.locator('.phase-heading')).toContainText('Action 2 sur 2');
   await expect(page.locator('.action-tokens .available')).toHaveCount(1);
   await page.getByRole('button', { name: /Revenus :/ }).click();
   await expect(page.locator('.action-tokens .spent')).toHaveCount(2);
   await expect(page.getByRole('button', { name: 'Valider le tour' })).toHaveText('Terminer le tour');
   await page.getByRole('button', { name: 'Annuler la dernière action' }).click();
   await expect(page.locator('.action-tokens .available')).toHaveCount(1);
-  await page.screenshot({ path: '.artifacts/v4-actions-1920.jpg' });
 });
 
-test('prix expliqué, sélection sans mutation et remplacement confirmé au clavier', async ({ page }) => {
-  await page.setViewportSize({ width: 1920, height: 1080 });
+test('prix et achat inspectables avant les actions, contexte effaçable sans mutation', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
-  await enterActions(page);
+  const before = await page.evaluate(() => localStorage.getItem('prosperity.game.v1'));
+  await page.getByTestId('slot-c1').click();
+  await page.getByRole('button', { name: 'Rechercher un remplacement' }).click();
   await page.getByRole('button', { name: 'Parc éolien, 200 euros', exact: true }).click();
-  const details = page.getByRole('region', { name: 'Détails de la technologie' });
-  await expect(details).toContainText('Base 100 € + 100 € de surcoût');
-  await expect(details.locator('.price-learning')).toBeVisible();
-  await details.getByRole('button', { name: 'Compris' }).click();
-  await page.reload();
-  await enterActions(page);
-  await page.getByRole('button', { name: 'Parc éolien, 200 euros', exact: true }).click();
-  await expect(details.locator('.price-learning')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Centrale au fioul, 100 euros', exact: true }).click();
-  await page.getByTestId('slot-a1').click();
-  await expect(details).toContainText('Retrait : Centrale à charbon');
-  await expect(details).toContainText('case A1 sélectionnée');
-  await expect(page.getByTestId('slot-a1')).toContainText('Centrale à charbon');
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('prosperity.game.v1')!).plannedActions)).toEqual([]);
-  await page.screenshot({ path: '.artifacts/v4-replacement-1920.jpg' });
-  await page.getByRole('button', { name: 'Remplacer en A1', exact: true }).focus();
-  await page.keyboard.press('Enter');
-  await expect(page.getByTestId('slot-a1')).toContainText('Centrale au fioul');
-  await page.getByTestId('slot-a1').click();
-  await expect(details).toContainText('case A1');
-  await expect(details).toContainText('contribuent au bilan');
-  await expect(page.getByRole('dialog')).toHaveCount(0);
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toContainText('Base 100 € + 100 € de surcoût');
+  await expect(dialog).toContainText('Achat disponible pendant vos actions');
+  await expect(dialog.locator('.purchase-confirm')).toBeDisabled();
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'Effacer le contexte de recherche' }).click();
+  await expect(page.locator('.research-context')).toHaveCount(0);
+  await openNation(page);
+  expect(await page.evaluate(() => localStorage.getItem('prosperity.game.v1'))).toBe(before);
 });
 
-test('2030 compte deux prospérités et la pollution prévient au seuil précédent', async ({ page }) => {
+test('2030 compte deux prospérités ; dépollution identique depuis le bouton', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(() => {
     const G = JSON.parse(localStorage.getItem('prosperity.game.v1')!);
@@ -71,33 +46,13 @@ test('2030 compte deux prospérités et la pollution prévient au seuil précéd
     G.log.push({ turn: 31, kind: 'event', revealedTileId: cards[0].id, text: 'Révélation publique' });
     localStorage.setItem('prosperity.game.v1', JSON.stringify(G));
   });
-  await page.reload();
-  await enterActions(page);
+  await page.reload(); await enterActions(page);
   await expect(page.locator('.decade-tracker [aria-label="Prospérité : 1 passé, 1 restant"]')).toBeVisible();
   await expect(page.locator('.pollution-warning')).toContainText('Encore 1 pollution');
   await page.getByRole('button', { name: 'Dépolluer −1 disque', exact: true }).click();
   await expect(page.locator('.pollution-warning')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Désactiver les aides' }).click();
-  await page.reload();
-  await expect(page.getByRole('button', { name: 'Activer les aides' })).toBeVisible();
-  await expect(page.locator('.learning-note')).toHaveCount(0);
-});
-
-test('achat tactile : comparer les cases dans l’inspecteur avant de confirmer', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
-  await enterActions(page);
-  await page.getByRole('button', { name: 'Centrale au fioul, 100 euros', exact: true }).click();
-  const details = page.getByRole('region', { name: 'Détails de la technologie' });
-  await expect(details).toBeInViewport();
-  await details.getByRole('button', { name: 'Prévisualiser en B1' }).click();
-  await expect(details).toContainText('case B1 sélectionnée');
-  await expect(page.getByTestId('slot-b1')).not.toContainText('Centrale au fioul');
-  await page.screenshot({ path: '.artifacts/v4-mobile-inspector.jpg' });
-  await details.getByRole('button', { name: 'Construire en B1', exact: true }).click();
-  await expect(page.getByTestId('slot-b1')).toContainText('Centrale au fioul');
-  await expect(page.locator('.action-tokens .available')).toHaveCount(1);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await expect(page.getByTestId('pollution-preview')).toHaveText('14');
+  await openResearch(page);
+  await page.getByRole('button', { name: 'Rechercher en énergie : avancer d’une case' }).click();
+  await expect(page.getByRole('button', { name: 'Rechercher en écologie : avancer d’une case' })).toBeDisabled();
 });

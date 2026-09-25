@@ -22,9 +22,9 @@
 .artwork-toggle { padding: 10px 0 17px; margin: 0 0 16px!important; border-bottom: 1px solid var(--line); }
 .tile-editor .artwork-toggle input { accent-color: var(--green); padding: 0; }
 
-@container tile-art (max-width: 76px) {
-  .art-symbols { gap: 2px; }
+@container tile-art (max-width: 110px) {
+  .art-symbols { gap: 2px; left: 3%; right: 3%; }
   .art-symbol, .play-slot .art-symbol, .play-market .art-symbol { padding: 2px; gap: 0; border: 0; }
-  .art-symbol b { display: none; }
+  .art-symbol b, .play-slot .art-symbol b, .play-market .art-symbol b { font-size: 8px; }
   .art-symbol svg, .play-slot .art-symbol svg, .play-market .art-symbol svg { width: 8px; height: 8px; }
 }

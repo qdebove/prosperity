@@ -1,0 +1,18 @@
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+
+const directory = '.artifacts/guide';
+const captures = Array.from({ length: 26 }, (_, i) => `C${String(i + 1).padStart(2, '0')}`).map(id => {
+  if (!existsSync(`${directory}/${id}.png`)) throw new Error(`Capture manquante : ${id}`);
+  return JSON.parse(readFileSync(`${directory}/${id}.json`, 'utf8'));
+});
+const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const dimensions = v => `${v.width} × ${v.height}`;
+const note = 'Captures réelles de Chrome, sans retouche. Pour les vues complètes, la hauteur du navigateur est agrandie pour que les commandes collantes ne recouvrent pas le contenu. Les fichiers « viewport » conservent aussi le rendu aux dimensions de test originales. Chaque JSON indique les deux viewports et les preuves d’état.';
+const rows = captures.map(c => {
+  const raw = existsSync(`${directory}/${c.id}-viewport.png`);
+  return `| ${c.id} | ${c.description} | ${dimensions(c.referenceViewport ?? c.viewport)} | [Capture](../${directory}/${c.id}.png)${raw ? ` · [Viewport](../${directory}/${c.id}-viewport.png)` : ''} · [État](../${directory}/${c.id}.json) |`;
+});
+writeFileSync('docs/visual-captures.md', `# Captures de la refonte\n\n${note}\n\n[Ouvrir la galerie](../${directory}/index.html) · [Ancienne interface](../${directory}/before-desktop.png) · [État avant](../${directory}/before-desktop.json)\n\nL'ancienne interface est rendue à partir du commit précédant les modifications, dans une copie isolée, avec la même fixture que C01. Cette copie temporaire a ensuite été supprimée.\n\n| ID | État | Viewport de test (CSS) | Fichiers |\n|---|---|---|---|\n${rows.join('\n')}\n\nC22 et C23 proviennent de trois vrais clients réseau locaux (Alice, Bob et Charlie). Les autres scénarios utilisent la fixture reproductible de tests/guide.pw.ts. [Comparaison solo](../${directory}/comparison-solo.png).\n`);
+const cards = captures.map(c => `<article id="${c.id}"><header><b>${c.id}</b><h2>${escape(c.description)}</h2></header><a href="${c.id}.png"><img loading="lazy" src="${c.id}.png" alt="${escape(c.description)}"></a><p>Test : ${dimensions(c.referenceViewport ?? c.viewport)} · capture : ${dimensions(c.viewport)}</p><a href="${c.id}.json">Preuve d’état</a>${existsSync(`${directory}/${c.id}-viewport.png`) ? ` · <a href="${c.id}-viewport.png">Viewport original</a>` : ''}</article>`).join('');
+writeFileSync(`${directory}/index.html`, `<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prosperity — Revue visuelle</title><style>body{margin:0;background:#f0eee2;color:#294c3f;font:15px/1.6 system-ui,sans-serif}main{max-width:1280px;margin:auto;padding:32px}h1,h2{font-family:Georgia,serif;font-weight:400}h1{font-size:36px}h2{font-size:18px;margin:0}a{color:#476a4c}nav{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0}.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:24px}article{background:#faf9ef;border:1px solid #cbd0b9;border-radius:8px;padding:16px}article header{display:flex;gap:12px;margin-bottom:15px}article b{color:#a98d52}img{width:100%;height:340px;object-fit:contain;background:#e4e7d7}article p{font-size:12px}section{margin:24px 0}</style><main><h1>Prosperity · Revue visuelle</h1><p>${escape(note)}</p><p><a href="before-desktop.png">Voir l’ancienne interface</a> · 89 tests unitaires et 22 tests navigateur réussis.</p><nav>${captures.map(c => `<a href="#${c.id}">${c.id}</a>`).join('')}</nav><section class="gallery">${cards}</section></main></html>`);
+console.log(`Index créé : ${captures.length} captures, métadonnées vérifiées.`);

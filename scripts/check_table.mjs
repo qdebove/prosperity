@@ -10,9 +10,9 @@ try {
     console.log(JSON.stringify(await page.evaluate(() => ({
       viewport: [innerWidth, innerHeight], scroll: [document.documentElement.scrollWidth, document.documentElement.scrollHeight],
       sizes: ['.table-surface', '.territory-frame', '.play-board', '.research-row', '.board-technology', '.board-technology > .tile-art'].map(selector => {
-        const el = document.querySelector(selector); const r = el.getBoundingClientRect();
+        const el = document.querySelector(selector); if (!el) return null; const r = el.getBoundingClientRect();
         return { selector, size: [r.width, r.height], css: [getComputedStyle(el).minHeight, getComputedStyle(el).aspectRatio] };
-      }),
+      }).filter(Boolean),
     }))));
   }
   await page.setViewportSize({ width: 1366, height: 768 });
@@ -21,7 +21,8 @@ try {
   const resolve = page.getByRole('button', { name: 'Valider', exact: true });
   if (await resolve.isVisible()) await resolve.click();
   await page.getByRole('button', { name: 'Continuer vers mes actions' }).click();
+  await page.getByRole('navigation', { name: 'Vues de la partie' }).getByRole('button', { name: 'Recherche', exact: true }).click();
   await page.getByRole('button', { name: 'Centrale au fioul, 100 euros' }).click();
-  await page.getByTestId('slot-a1').click();
+  await page.getByRole('button', { name: 'Prévisualiser en A1' }).click();
   await page.screenshot({ path: '.artifacts/table-purchase.jpg' });
 } finally { await browser.close(); }

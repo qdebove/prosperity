@@ -1,4 +1,4 @@
-import { enterActions, navigate } from './ui';
+import { enterActions, navigate, openResearch, openNation } from './ui';
 import { test, expect } from '@playwright/test';
 
 test('desktop: plateau, achat, sauvegarde et atelier', async ({ page }) => {
@@ -6,13 +6,14 @@ test('desktop: plateau, achat, sauvegarde et atelier', async ({ page }) => {
   page.on('pageerror', e => errors.push(e.message));
   await page.setViewportSize({ width: 1440, height: 1080 });
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Une nation en devenir', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Ma nation', exact: true })).toBeVisible();
   await page.screenshot({ path: '.artifacts/desktop.jpg', fullPage: true });
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
   await enterActions(page);
   await page.getByRole('button', { name: /Revenus/ }).click();
+  await openResearch(page);
   await page.getByRole('button', { name: 'Centrale au fioul, 100 euros', exact: true }).click();
-  await page.getByTestId('slot-b1').click();
+  await page.getByRole('button', { name: 'Prévisualiser en B1' }).click();
   await page.getByRole('button', { name: /^(Construire|Remplacer) en B1$/ }).click();
   await expect(page.getByTestId('slot-b1')).toContainText('Centrale au fioul');
   let staged = await page.evaluate(() => JSON.parse(localStorage.getItem('prosperity.game.v1')!));
@@ -25,8 +26,9 @@ test('desktop: plateau, achat, sauvegarde et atelier', async ({ page }) => {
   await page.getByRole('button', { name: 'Annuler la dernière action', exact: true }).click();
   await expect(page.getByTestId('slot-b1')).not.toContainText('Centrale au fioul');
   await expect(page.getByRole('button', { name: 'Valider le tour', exact: true })).toHaveCount(0);
+  await openResearch(page);
   await page.getByRole('button', { name: 'Centrale au fioul, 100 euros', exact: true }).click();
-  await page.getByTestId('slot-b1').click();
+  await page.getByRole('button', { name: 'Prévisualiser en B1' }).click();
   await page.getByRole('button', { name: /^(Construire|Remplacer) en B1$/ }).click();
   await page.getByRole('button', { name: 'Valider le tour', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Tour suivant', exact: true })).toBeEnabled();
@@ -61,14 +63,17 @@ test('mobile: affichage sans débordement, navigation et actions', async ({ page
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
   await enterActions(page);
   const before = await page.evaluate(() => JSON.parse(localStorage.getItem('prosperity.game.v1')!));
+  await openResearch(page);
   await page.getByRole('button', { name: 'Rechercher en énergie : avancer d’une case' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
+  await openNation(page);
   await page.getByRole('button', { name: /Dépolluer : retirer/ }).first().click();
   await expect(page.getByRole('button', { name: 'Valider le tour', exact: true })).toBeEnabled();
   await page.screenshot({ path: '.artifacts/mobile-planned.jpg', fullPage: true });
   await page.getByRole('button', { name: 'Annuler les deux actions' }).click();
   await expect(page.getByTestId('pollution-preview')).toHaveText(`${before.pollution}`);
   await expect(page.getByRole('button', { name: 'Valider le tour', exact: true })).toHaveCount(0);
+  await openResearch(page);
   await page.getByRole('button', { name: 'Rechercher en écologie : avancer d’une case' }).click();
   await expect(page.getByRole('region', { name: 'Plateau de recherche et technologies' })).toBeVisible();
   await page.getByRole('button', { name: /Revenus/ }).click();
@@ -193,6 +198,7 @@ test('illustration personnalisée: cinq symboles, aperçu, export et partie', as
   await navigate(page, 'Nouvelle partie');
   await page.getByRole('dialog').getByRole('checkbox').check();
   await page.getByRole('button', { name: 'Fonder ma nation' }).click();
+  await openResearch(page);
   const card = page.getByRole('button', { name: /^Ville expérimentale,/ });
   await expect(card.locator('.art-symbol')).toHaveCount(5);
   await card.scrollIntoViewIfNeeded();
@@ -205,7 +211,7 @@ test('illustration personnalisée: cinq symboles, aperçu, export et partie', as
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
   await enterActions(page);
   await card.click();
-  await page.getByTestId('slot-a2').click();
+  await page.getByRole('button', { name: 'Prévisualiser en A2' }).click();
   await page.getByRole('button', { name: /^(Construire|Remplacer) en A2$/ }).click();
   const placed = page.getByTestId('slot-a2');
   await expect(placed.locator('.art-symbol')).toHaveCount(5);
@@ -222,6 +228,6 @@ test('illustration personnalisée: cinq symboles, aperçu, export et partie', as
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: '.artifacts/custom-mobile-board.jpg' });
   await placed.click();
-  await expect(page.getByRole('region', { name: 'Détails de la technologie' }).locator('.art-symbol')).toHaveCount(5);
-  await expect(page.getByRole('region', { name: 'Détails de la technologie' }).locator('[data-symbol="energy"] b')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Détails de la case' }).locator('.art-symbol')).toHaveCount(5);
+  await expect(page.getByRole('region', { name: 'Détails de la case' }).locator('[data-symbol="energy"] b')).toBeVisible();
 });

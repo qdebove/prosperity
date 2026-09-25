@@ -13,3 +13,11 @@ export async function enterActions(page: Page) {
   const proceed = page.getByRole('button', { name: 'Continuer vers mes actions' });
   if (await proceed.isVisible()) await proceed.click();
 }
+
+export async function openResearch(page: Page) {
+  await page.getByRole('navigation', { name: 'Vues de la partie' }).getByRole('button', { name: 'Recherche', exact: true }).click();
+}
+
+export async function openNation(page: Page) {
+  await page.getByRole('navigation', { name: 'Vues de la partie' }).getByRole('button', { name: 'Ma nation', exact: true }).click();
+}

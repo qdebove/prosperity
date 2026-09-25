@@ -6,10 +6,11 @@ import type { GameState, PlannedAction, Stats, Symbol, Tile, Track } from './typ
 export const LEVEL_STARTS = [0, 2, 5, 9, 14, 20];
 export const MAX_RESEARCH = 26;
 export const POLLUTION_LIMIT = 16;
+export const POLLUTION_PP_SPACES = [1, 6, 11] as const;
 export const TALLY_RATES = { energy: 50, ecology: 50, capital: 100 } as const;
 export const FINAL_STEPS: Symbol[] = ['energy', 'energy', 'ecology', 'ecology', 'capital', 'research', 'prosperity'];
 export const levelAt = (position: number) => LEVEL_STARTS.filter(start => position >= start).length;
-export const pollutionBonus = (pollution: number) => [1, 6, 11].filter(space => pollution < space).length;
+export const pollutionBonus = (pollution: number) => POLLUTION_PP_SPACES.filter(space => pollution < space).length;
 
 export function totals(G: GameState): Stats {
   return Object.values(G.board).reduce<Stats>((sum, tile) => {

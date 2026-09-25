@@ -31,9 +31,9 @@ test('66 illustrations distinctes et non vides, aucun scan affiché', async ({ p
   await page.screenshot({ path: '.artifacts/illustrated-mobile.jpg' });
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
   await page.getByTestId('slot-a1').click();
-  await expect(page.getByRole('region', { name: 'Détails de la technologie' }).locator('[data-symbol="energy"]')).toHaveText('+2');
-  await expect(page.getByRole('region', { name: 'Détails de la technologie' }).locator('[data-symbol="ecology"]')).toHaveText('-1');
-  await page.getByRole('button', { name: 'Fermer les détails', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Détails de la case' }).locator('[data-symbol="energy"]')).toHaveText('+2');
+  await expect(page.getByRole('region', { name: 'Détails de la case' }).locator('[data-symbol="ecology"]')).toHaveText('-1');
+  await page.getByRole('button', { name: 'Fermer', exact: true }).click();
   await page.setViewportSize({ width: 1440, height: 1000 });
   await navigate(page, 'Atelier de tuiles');
   const technologies = await checkFrames(page, '.library-grid .atlas-frame');

@@ -23,16 +23,16 @@ Le dossier `dist` peut être servi par un hébergement statique pour le solo. Po
 ## Jeu
 
 - 24 technologies disponibles au départ, puis 36 révélations en sept décennies.
-- Table de jeu plein écran sur desktop ; navigation générale accessible par le bouton de menu.
-- Technologies disposées en six niveaux entre les branches énergie et écologie, avec prix contextualisés et pions animés sur les 27 cases de recherche.
+- Trois vues : Ma nation, Recherche et Comparaison. Navigation générale accessible par le bouton de menu ; défilement vertical naturel.
+- Technologies disposées en six niveaux, du niveau 6 au niveau 1, avec deux cartes maximum par ligne et par domaine. Chaque piste affiche ses 27 sous-étapes et son jeton sur la case exacte, indépendamment de la hauteur des cartes.
 - Révélation, décompte puis actions : une progression visible et une commande principale en bas de la table. Les quatre actions apparaissent pendant leur phase, avec deux jetons numérotés puis cochés ; une même action peut être répétée.
 - Deux actions préparées par tour : aperçu cumulé, variations chiffrées, annulation de la dernière action ou de toute la préparation, puis validation explicite.
 - Placement par couleur, remplacement des effets, ouverture des deux cases inférieures par le transport de gauche.
-- Achat par sélection d’une technologie puis d’une case compatible et confirmation dans l’inspecteur. Les cases sont sélectionnables sur le territoire ou directement dans l’inspecteur. Prix décomposé, effets retirés et ajoutés, bilan avant/après et accès restent consultables sans fenêtre bloquante, y compris au clavier et au toucher. Une technologie hors budget peut être examinée ; le financement manquant est indiqué et l’achat reste indisponible.
-- Marché annoté : achat disponible, accessible en deux actions ou hors de portée ce tour. Ces états sont obtenus en rejouant les actions possibles dans le moteur.
+- Chaque case ouvre une fenêtre : bâtiment installé, catégorie libre ou transport requis. Depuis D1/D2, la recherche cible C1. La confirmation présente l'emplacement, le prix, la tuile remplacée, les effets retirés/ajoutés et le budget avant/après. Les technologies hors budget restent inspectables. Fermeture par croix, Échap ou arrière-plan, focus clavier contenu et rendu au déclencheur.
+- Marché annoté : achat disponible, catégorie incompatible, accès fermé, fonds insuffisants ou phase d’actions requise. Les possibilités d'achat et leurs aperçus utilisent le moteur existant.
 - Suivi compact des décomptes révélés dans la décennie, dont les deux prospérités de 2030. Le suivi utilise le journal public et s’adapte au catalogue choisi.
-- Piste de pollution à disques, symboles de prospérité découverts, avertissement à 15 et blocage explicite à partir de 16 pollutions, y compris au-delà de la piste.
-- Trois aides progressives au premier tour et explication du surcoût la première fois. « Compris » et le bouton d’aide mémorisent les préférences dans ce navigateur.
+- Piste de pollution à disques interactifs, repères des PP même couverts, avertissement à 15 et blocage explicite à partir de 16 pollutions, y compris au-delà de la piste. Cliquer un disque retire toujours la dernière pollution occupée.
+- Aide, journal et détails des décomptes accessibles à la demande. Comparaison des nations réelles en réseau ; bilan de la seule nation en solo.
 - Décomptes énergie, écologie, capital, recherche et prospérité, choix du paiement des déficits, allocation de recherche et pollution sans plafond.
 - Décompte final dans l'ordre du livret, journal, annulation de la dernière action, sauvegarde automatique et records locaux.
 - Interface adaptée aux petits écrans, navigation clavier, règles en français et accès au PDF original.
@@ -58,8 +58,8 @@ Les données sont stockées dans `localStorage` sur l'origine du navigateur. L'e
 - `src/game/presentation.ts` : sélecteurs purs de prix, disponibilité, aperçu, effets d’action et suivi des révélations, partagés entre solo et multijoueur.
 - `src/GameBoard.tsx` : plateau, marché, actions et décomptes.
 - `src/game-ui/` : plateau de recherche, territoire, pollution, détails d’achat et séquence de tour. Les aperçus utilisent le moteur existant ; aucune règle n’est recalculée dans la présentation.
-- `src/table.css` et `src/game-ui/table-ux.css` : composition du mode jeu, hiérarchie des phases, transitions courtes et prise en compte de la préférence de réduction des animations.
-- `src/game-ui/sound.ts` : raccordement facultatif de sons locaux de tuile, pion, disque et monnaie. Aucun son provisoire n’est fourni ; le bouton reste coupé tant que `SOUND_ASSETS` est vide.
+- `src/table.css` : thème et composition des trois vues, styles consolidés, responsive et réduction des animations.
+- `src/game-ui/sound.ts` : ancien raccordement facultatif de sons locaux, conservé sans bouton dans la nouvelle interface ; aucun asset sonore n'est installé.
 - `src/Editor.tsx` : atelier de tuiles.
 - `src/artwork.ts` : correspondance des 66 illustrations, cadrages et anciennes références.
 - `src/storage.ts` : sauvegardes locales et exports.
@@ -83,7 +83,7 @@ Ouvrir `http://127.0.0.1:5173/multiplayer`, créer une partie et partager le lie
 
 Le serveur Node (`npm run server`, port 8000) reste autoritaire. Chacun possède sa nation ; les décomptes s’appliquent dans l’ordre de la table et le classement final rétablit les bonus de recherche multijoueurs. Les territoires sont consultables et les marqueurs de recherche numérotés identifient tous les joueurs.
 
-L’interface de tour et l’inspecteur sont communs au solo et au réseau. Le joueur actif, la nation consultée et les résultats publics du décompte sont distingués. Seule la nation devant résoudre un choix dispose du bouton de validation ; les autres peuvent examiner la table. Les prix et aperçus suivent la nation consultée. Le suivi de décennie ne lit jamais la pioche cachée.
+Les vues et fenêtres de détail sont communes au solo et au réseau. Le joueur actif, la nation consultée et les résultats publics du décompte sont distingués. Seule la nation devant résoudre un choix dispose du bouton de validation ; les autres peuvent examiner la table. Les prix et aperçus suivent la nation consultée. Le suivi de décennie ne lit jamais la pioche cachée.
 
 Les deux actions sont préparées et prévisualisées exclusivement dans le navigateur, avec annulation et sauvegarde locale. La validation envoie un seul batch, rejoué atomiquement par le moteur serveur. Les autres joueurs ne reçoivent les actions qu’après validation et sauvegarde. Les doubles envois sont reconnus sans rejouer le tour.
 
@@ -107,7 +107,7 @@ Les tests du moteur couvrent les achats invalides, les remplacements, les accès
 
 Les tests multijoueurs couvrent aussi les cinq décomptes par nation, les choix obligatoires, les batches dépendants et atomiques, les doublons, les préparations obsolètes, les secrets des snapshots et de vraies connexions réseau. Un scénario Playwright ouvre trois contextes Chrome indépendants et vérifie création, préparation privée, annulation, commits, rechargement, coupure réseau et affichage mobile.
 
-Les scénarios UX vérifient aussi la commande principale unique, les actions répétées, la confirmation d’un remplacement au clavier, les explications de prix mémorisées, le double décompte de 2030 et l’avertissement avant pollution critique.
+Les scénarios UX vérifient aussi les actions répétées, les prix et phases, le double décompte de 2030 et l’avertissement avant pollution critique. La campagne `tests/guide.pw.ts` vérifie les groupes de 0/1/2/3/5 cartes, les frontières des pistes, le contexte de placement, la double confirmation, le focus et les largeurs 360/390/768/1366/1920. Elle produit les captures et leurs preuves d'état dans `.artifacts/guide/` ; C22/C23 proviennent du test réseau à trois navigateurs. Voir le [compte rendu visuel](docs/visual-refresh.md).
 
 ## Crédits
 
