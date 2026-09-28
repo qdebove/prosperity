@@ -4,21 +4,21 @@ Adaptation française jouable de Prosperity (Reiner Knizia et Sebastian Bleasdal
 
 ## Démarrer
 
-Node.js 22 recommandé.
+Node.js 22 recommandé (Next.js requiert au minimum Node.js 20.9).
 
 ```sh
-npm install --legacy-peer-deps
+npm install
 npm run dev
 ```
 
-Ouvrir l'adresse affichée par Vite, généralement http://127.0.0.1:5173. Pour une version compilée :
+Ouvrir http://127.0.0.1:3000. Pour une version de production locale :
 
 ```sh
 npm run build
-npm run preview
+npm start
 ```
 
-Le dossier `dist` peut être servi par un hébergement statique pour le solo. Polices, illustrations et règles sont incluses dans le projet.
+Le frontend utilise Next.js App Router. Polices, illustrations et règles sont incluses dans le projet.
 
 ## Jeu
 
@@ -51,7 +51,7 @@ Les données sont stockées dans `localStorage` sur l'origine du navigateur. L'e
 
 ## Architecture
 
-- React, TypeScript et Vite pour l'interface.
+- Next.js 16 App Router, React et TypeScript pour l'interface. L'application de jeu existante reste derrière une frontière client sans SSR.
 - [boardgame.io](https://github.com/boardgameio/boardgame.io) pour l'exécution des coups, l'état de partie et le mélange reproductible. La préparation est une liste d'actions rejouée par les mêmes règles pour l'aperçu et la validation atomique.
 - `src/game/catalog.ts` : les 60 tuiles, les bâtiments de départ et la validation du catalogue.
 - `src/game/engine.ts` : règles et coups indépendants de l'interface.
@@ -79,7 +79,7 @@ Les anciens chemins d'illustrations sont reconnus à l'import et dans les sauveg
 npm run dev:multi
 ```
 
-Ouvrir `http://127.0.0.1:5173/multiplayer`, créer une partie et partager le lien. Deux à quatre joueurs rejoignent, se déclarent prêts, puis le créateur lance. Pour tester plusieurs joueurs sur une machine, utiliser des profils de navigateur distincts. Le menu du solo propose également « Jouer en multijoueur ».
+Ouvrir `http://127.0.0.1:3000/multiplayer`, créer une partie et partager le lien. Deux à quatre joueurs rejoignent, se déclarent prêts, puis le créateur lance. Pour tester plusieurs joueurs sur une machine, utiliser des profils de navigateur distincts. Le menu du solo propose également « Jouer en multijoueur ».
 
 Le serveur Node (`npm run server`, port 8000) reste autoritaire. Chacun possède sa nation ; les décomptes s’appliquent dans l’ordre de la table et le classement final rétablit les bonus de recherche multijoueurs. Les territoires sont consultables et les marqueurs de recherche numérotés identifient tous les joueurs.
 
@@ -93,7 +93,7 @@ Une reconnexion retrouve la session invitée et un snapshot complet. La prépara
 
 Les fichiers principaux sont `src/multiplayer/game.ts` (orchestration), `draft.ts` (préparation privée), `NetworkGame.tsx` (plateau distant), et `server/` (lobby, identité, stockage et intégration du transport natif). [La documentation multijoueur](docs/multiplayer.md) décrit les protocoles, le filtrage des secrets, la reconnexion, les points d’extension et les variables d’environnement pour un déploiement futur.
 
-Les dépendances serveur vulnérables et Vitest ont reçu des mises à jour ciblées, sans rétrograder boardgame.io. L’audit laisse deux alertes modérées liées à Svelte et à leur remontée sur boardgame.io ; ce débogueur et son rendu SSR ne sont pas utilisés (`debug: false`). Le détail et les limites de déploiement figurent dans la documentation.
+Les dépendances ont reçu des mises à jour ciblées, sans remplacer boardgame.io. `npm audit` ne signale aucune vulnérabilité avec le verrou actuel. Le détail et les limites de déploiement figurent dans la documentation.
 
 ## Vérifications
 
@@ -103,7 +103,9 @@ npm run build
 npm run test:e2e
 ```
 
-Les tests du moteur couvrent les achats invalides, les remplacements, les accès, les prix, les décomptes, les limites, le score final et une partie complète avec rechargements. Les tests Playwright utilisent Chrome installé localement et démarrent Vite sur le port 5173 ainsi que le serveur de jeu sur le port 8000 si nécessaire. Ils vérifient une partie complète, les sauvegardes, l'atelier et le mobile, ainsi que les pions, les remplacements, les accès et la pollution critique. Les quatre formats desktop (1366×768, 1440×900, 1920×1080, 2560×1440) sont contrôlés avec les 60 technologies révélées. Les captures sont écrites dans `.artifacts`. `node scripts/check_table.mjs` produit aussi des vues du plateau et d’un achat avec remplacement.
+Les tests du moteur couvrent les achats invalides, les remplacements, les accès, les prix, les décomptes, les limites, le score final et une partie complète avec rechargements. Les tests Playwright utilisent Chrome installé localement et démarrent Next.js sur le port 3000 ainsi que le serveur de jeu sur le port 8000 si nécessaire. Ils vérifient une partie complète, les sauvegardes, l'atelier et le mobile, ainsi que les pions, les remplacements, les accès et la pollution critique. Les quatre formats desktop (1366×768, 1440×900, 1920×1080, 2560×1440) sont contrôlés avec les 60 technologies révélées. Les captures sont écrites dans `.artifacts`. `node scripts/check_table.mjs` produit aussi des vues du plateau et d’un achat avec remplacement.
+
+Le déploiement coordonné du frontend et du serveur WebSocket sur Vercel est décrit dans [docs/deployment-vercel.md](docs/deployment-vercel.md).
 
 Les tests multijoueurs couvrent aussi les cinq décomptes par nation, les choix obligatoires, les batches dépendants et atomiques, les doublons, les préparations obsolètes, les secrets des snapshots et de vraies connexions réseau. Un scénario Playwright ouvre trois contextes Chrome indépendants et vérifie création, préparation privée, annulation, commits, rechargement, coupure réseau et affichage mobile.
 

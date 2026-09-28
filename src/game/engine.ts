@@ -1,5 +1,5 @@
 import type { Game } from 'boardgame.io';
-import { INVALID_MOVE } from 'boardgame.io/core';
+import { INVALID_MOVE } from 'boardgame.io/dist/cjs/core.js';
 import { BASE_CATALOG, LABELS, SLOTS } from './catalog';
 import type { GameState, PlannedAction, Stats, Symbol, Tile, Track } from './types';
 

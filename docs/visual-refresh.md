@@ -39,7 +39,7 @@ Les styles du jeu sont regroupés dans `src/table.css` ; l'ancien fichier de sur
 | Commande | Résultat final |
 |---|---|
 | `npm test` | 89 tests réussis, 6 fichiers |
-| `npm run build` | TypeScript et compilation Vite réussis |
+| `npm run build` | TypeScript et compilation Next.js réussis |
 | `npm run test:e2e` | 22 tests navigateur réussis |
 | `npm run test:e2e -- tests/guide.pw.ts tests/multiplayer.pw.ts` | 7 parcours réussis après ajustement des prises de vue complètes |
 | `node scripts/index-captures.mjs` | Présence des 26 captures et métadonnées vérifiée, index généré |
@@ -55,7 +55,7 @@ Les tests navigateur couvrent une partie solo complète de 36 tours, l'atelier e
 - `src/GameBoard.tsx` : navigation, contexte, fenêtres et commandes du tour.
 - `src/game-ui/{PlayerTerritory,ResearchBoard,PollutionTrack,TechnologyDetails,DecadeTracker}.tsx`, nouveau `ComparisonBoard.tsx` : vues et interactions.
 - `src/components.tsx` : titre accessible, boucle de focus et fermeture des fenêtres.
-- `src/table.css`, `src/play.css`, `src/main.tsx` : styles consolidés et symboles compacts ; suppression de `src/game-ui/table-ux.css`.
+- `src/table.css`, `src/play.css`, `src/app/layout.tsx` : styles consolidés, chargés globalement par l’App Router, et symboles compacts ; suppression de `src/game-ui/table-ux.css`.
 - `src/game/engine.ts` : export de la constante des seuils PP, sans changement de calcul.
 - `src/multiplayer/NetworkGame.tsx` : comparaison depuis les états réels et identité des jetons.
 - `tests/guide.pw.ts`, suites navigateur existantes et `tests/ui.ts` : scénarios, régressions et captures.

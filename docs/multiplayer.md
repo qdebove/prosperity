@@ -9,7 +9,7 @@ npm install --legacy-peer-deps
 npm run dev:multi
 ```
 
-Ouvrir `http://127.0.0.1:5173/multiplayer`, créer une partie et partager son lien `/game/<code>`. Utiliser des profils de navigateur distincts pour simuler plusieurs personnes : les onglets du même profil partagent la même session invitée. Deux à quatre personnes prennent place, se déclarent prêtes, puis le créateur lance la partie. Le premier joueur est tiré au sort par le moteur. Le solo reste disponible à `/` et conserve sa sauvegarde séparée.
+Ouvrir `http://127.0.0.1:3000/multiplayer`, créer une partie et partager son lien `/game/<code>`. Utiliser des profils de navigateur distincts pour simuler plusieurs personnes : les onglets du même profil partagent la même session invitée. Deux à quatre personnes prennent place, se déclarent prêtes, puis le créateur lance la partie. Le premier joueur est tiré au sort par le moteur. Le solo reste disponible à `/` et conserve sa sauvegarde séparée.
 
 Les deux processus peuvent aussi être lancés séparément :
 
@@ -18,7 +18,7 @@ npm run server
 npm run dev
 ```
 
-Le serveur écoute par défaut sur `127.0.0.1:8000`. Pour jouer entre machines d’un réseau, configurer `HOST=0.0.0.0` côté serveur, `CLIENT_ORIGINS` avec l’adresse exacte du frontend et lancer Vite avec `--host 0.0.0.0`. Les variables se définissent selon le shell utilisé. Ne pas partager un lien `localhost` à une autre machine.
+Le serveur écoute par défaut sur le port `8000`. Pour jouer entre machines d’un réseau, configurer `HOST=0.0.0.0`, `FRONTEND_ORIGIN` avec l’adresse exacte du frontend et `NEXT_PUBLIC_GAME_SERVER_URL` avec l’adresse joignable du serveur. Les variables se définissent selon le shell utilisé. Ne pas partager un lien `localhost` à une autre machine.
 
 ## État, moteur et présentation
 
@@ -102,19 +102,19 @@ Pour ajouter des comptes, remplacer cet adaptateur et l’échange de session da
 | --- | --- | --- |
 | `HOST` | `127.0.0.1` | Interface d’écoute du serveur |
 | `PORT` | `8000` | Port HTTP et Socket.IO |
-| `CLIENT_ORIGINS` | `http://127.0.0.1:5173,http://localhost:5173` | Origines exactes autorisées, séparées par des virgules |
-| `MULTIPLAYER_TARGET` | `http://127.0.0.1:8000` | Cible du proxy Vite pour `/api` et `/socket.io` |
-| `VITE_MULTIPLAYER_URL` | vide | URL du serveur si frontend et backend ont des origines différentes |
+| `FRONTEND_ORIGIN` | `http://127.0.0.1:3000` | Origine frontend exacte autorisée par CORS |
+| `CLIENT_ORIGINS` | vide | Compatibilité facultative : plusieurs origines séparées par des virgules |
+| `NEXT_PUBLIC_GAME_SERVER_URL` | `http://127.0.0.1:8000` en développement | URL publique utilisée par le navigateur pour l’API et Socket.IO |
 
-En production : frontend statique avec repli des chemins `/game/*` vers `index.html`, processus Node longue durée, TLS et stockage durable. Avec un reverse proxy, transmettre `/api` et `/socket.io`, y compris les upgrades WebSocket ; sinon définir `VITE_MULTIPLAYER_URL` avant compilation. `dist` ne contient que le frontend : le serveur TypeScript se lance séparément avec `npm run server` (installer les dépendances de développement, dont `tsx`, avec cette méthode).
+En production : frontend Next.js et processus Node/Socket.IO séparés dans la même codebase. Définir `NEXT_PUBLIC_GAME_SERVER_URL` avant le build du frontend et `FRONTEND_ORIGIN` sur le serveur. Le serveur TypeScript se lance avec `npm run server`; son entrée racine `server.ts` est détectable comme serveur Node par Vercel. Voir [deployment-vercel.md](deployment-vercel.md).
 
 Les corps du lobby sont limités à 4 Mio, les messages entrants Socket.IO à 16 Kio. Les catalogues et commandes sont validés au runtime. Les routes génériques `/games` de boardgame.io et ses événements arbitraires, undo, redo et chat sont bloqués. Le reverse proxy peut appliquer des limites de débit sans modifier le moteur. Les logs structurés contiennent match, siège, tour, identifiant de commande, types d’actions, révision et résultat ; jamais les secrets de session.
 
 ## Dépendances et vérifications
 
-L’audit avec accès au registre a confirmé les anciennes alertes. Les corrections ciblées conservent boardgame.io 0.50.2 : Socket.IO 4.8.3 pour toute la pile (y compris `koa-socket-2`), `@koa/cors` 5.0.0, `cookie` 0.7.2 pour `react-cookies`, Vitest 4.1.11. Aucun `npm audit fix --force` ni rétrogradation de boardgame.io.
+Les corrections ciblées conservent boardgame.io 0.50.2 : Socket.IO 4.8.3 pour toute la pile (y compris `koa-socket-2`), `@koa/cors` 5.0.0, `cookie` 0.7.2 pour `react-cookies`, Vitest 4.1.11. Le verrou actuel passe `npm audit` sans alerte. Aucun `npm audit fix --force` ni rétrogradation de boardgame.io.
 
-Deux alertes modérées restent signalées : Svelte 3, dépendance du débogueur boardgame.io, et la remontée correspondante sur boardgame.io. L’application utilise React, `debug: false` et aucun rendu SSR Svelte. La migration majeure de cet outillage inutilisé reste hors périmètre ; l’audit doit être refait avant une exposition publique.
+L’application utilise React et désactive le débogueur boardgame.io (`debug: false`). L’audit doit être rejoué avant chaque exposition publique afin de tenir compte des avis publiés après ce verrou.
 
 ```sh
 npm test

@@ -3,7 +3,9 @@ import { SocketIO } from 'boardgame.io/multiplayer';
 import { createMultiplayerGame } from './game';
 import type { CommandResult, Session } from './types';
 
-export const serverURL = import.meta.env.VITE_MULTIPLAYER_URL || '';
+const configuredServerURL = process.env.NEXT_PUBLIC_GAME_SERVER_URL?.replace(/\/$/, '');
+export const serverURL = configuredServerURL
+  ?? (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' ? 'http://127.0.0.1:8000' : '');
 export function createNetworkClient(session: Session, numPlayers: number, onResult: (result: CommandResult) => void, onSync: () => void, onDisconnect: () => void) {
   const native = SocketIO({ server: serverURL || undefined });
   let transport: ReturnType<typeof native> | undefined;

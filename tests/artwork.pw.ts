@@ -1,8 +1,8 @@
-import { enterActions, navigate } from './ui';
+import { enterActions, navigate, openApp } from './ui';
 import { expect, test, type Page } from '@playwright/test';
 
 async function checkFrames(page: Page, selector: string) {
-  await page.locator(`${selector} img`).evaluateAll(images => images.forEach(image => image.loading = 'eager'));
+  await page.locator(`${selector} img`).evaluateAll(images => images.forEach(image => (image as HTMLImageElement).loading = 'eager'));
   await page.waitForFunction(selector => [...document.querySelectorAll<HTMLImageElement>(`${selector} img`)].every(image => image.complete && image.naturalWidth > 0), selector);
   return page.locator(selector).evaluateAll(frames => frames.map(frame => {
     const image = frame.querySelector('img')!;
@@ -23,7 +23,7 @@ test('66 illustrations distinctes et non vides, aucun scan affiché', async ({ p
   const oldRequests: string[] = [];
   page.on('request', request => { if (/\/assets\/[^/]+\.jpg/.test(request.url())) oldRequests.push(request.url()); });
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto('/');
+  await openApp(page);
   const starting = await checkFrames(page, '.play-board .atlas-frame');
   expect(starting).toHaveLength(6);
   await page.screenshot({ path: '.artifacts/illustrated-desktop.jpg' });
@@ -56,7 +56,7 @@ test('66 illustrations distinctes et non vides, aucun scan affiché', async ({ p
 });
 
 test('une sauvegarde existante reçoit les nouveaux visuels et garde son état', async ({ page }) => {
-  await page.goto('/');
+  await openApp(page);
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
   await enterActions(page);
   await page.getByRole('button', { name: /Revenus/ }).click();

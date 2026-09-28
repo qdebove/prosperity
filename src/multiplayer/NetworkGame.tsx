@@ -21,9 +21,9 @@ export default function NetworkGame({ session, numPlayers }: { session: Session;
   const [inspected, setInspected] = useState(session.playerId);
   const [rules, setRules] = useState(false);
   const [shownActions, setShownActions] = useState(2);
-  const connection = useRef<NetworkClient>();
-  const pending = useRef<CommitPreparedTurnCommand>();
-  const timeout = useRef<ReturnType<typeof setTimeout>>();
+  const connection = useRef<NetworkClient | undefined>(undefined);
+  const pending = useRef<CommitPreparedTurnCommand | undefined>(undefined);
+  const timeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const localKey = draftKey(session.gameId, session.playerId);
   const commandKey = `${localKey}.command`;
   useEffect(() => {

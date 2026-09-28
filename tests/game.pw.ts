@@ -1,11 +1,11 @@
-import { enterActions, navigate, openResearch, openNation } from './ui';
+import { enterActions, navigate, openApp, openResearch, openNation } from './ui';
 import { test, expect } from '@playwright/test';
 
 test('desktop: plateau, achat, sauvegarde et atelier', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.setViewportSize({ width: 1440, height: 1080 });
-  await page.goto('/');
+  await openApp(page);
   await expect(page.getByRole('heading', { name: 'Ma nation', exact: true })).toBeVisible();
   await page.screenshot({ path: '.artifacts/desktop.jpg', fullPage: true });
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
@@ -57,7 +57,7 @@ test('desktop: plateau, achat, sauvegarde et atelier', async ({ page }) => {
 
 test('mobile: affichage sans débordement, navigation et actions', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await openApp(page);
   await page.screenshot({ path: '.artifacts/mobile.jpg', fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
@@ -92,7 +92,7 @@ test('mobile: affichage sans débordement, navigation et actions', async ({ page
 });
 
 test('une partie entière jusqu’au score final et au record', async ({ page }) => {
-  await page.goto('/');
+  await openApp(page);
   for (let step = 0; step < 220; step++) {
     const g = await page.evaluate(() => JSON.parse(localStorage.getItem('prosperity.game.v1')!));
     if (g.phase === 'finished') break;
@@ -119,7 +119,7 @@ test('une partie entière jusqu’au score final et au record', async ({ page })
 
 test('catalogue personnalisé: modification, import validé et nouvelle partie', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto('/');
+  await openApp(page);
   await navigate(page, 'Atelier de tuiles');
   await page.getByRole('spinbutton', { name: 'Valeur Écologie' }).fill('3');
   await page.getByRole('button', { name: 'Enregistrer la tuile' }).click();
@@ -129,7 +129,7 @@ test('catalogue personnalisé: modification, import validé et nouvelle partie',
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('prosperity.catalog.v1')!));
   expect(saved[0].ecology).toBe(3);
   await page.getByLabel('Importer un catalogue JSON').setInputFiles({ name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify([{ ...saved[0], category: '__proto__' }])) });
-  await expect(page.getByRole('alert')).toContainText('Import impossible');
+  await expect(page.getByRole('alert').filter({ hasText: 'Import impossible' })).toContainText('Import impossible');
   await page.getByLabel('Importer un catalogue JSON').setInputFiles({ name: 'valid.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ version: 1, tiles: saved })) });
   await expect(page.getByRole('dialog')).toContainText('60 tuiles');
   await page.getByRole('button', { name: 'Importer ce catalogue' }).click();
@@ -142,12 +142,12 @@ test('catalogue personnalisé: modification, import validé et nouvelle partie',
   expect(g.catalog[0].ecology).toBe(3);
   expect(g.totalTurns).toBe(36);
   await navigate(page, 'Atelier de tuiles');
-  await page.locator('img').evaluateAll(images => images.forEach(img => img.loading = 'eager'));
+  await page.locator('img').evaluateAll(images => images.forEach(img => (img as HTMLImageElement).loading = 'eager'));
   await page.waitForFunction(() => [...document.images].every(img => img.complete && img.naturalWidth > 0));
 });
 
 test('dimensions variées et absence de débordements', async ({ page }) => {
-  await page.goto('/');
+  await openApp(page);
   for (const width of [320, 768, 1024, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `largeur ${width}`).toBe(true);
@@ -159,7 +159,7 @@ test('dimensions variées et absence de débordements', async ({ page }) => {
 
 test('illustration personnalisée: cinq symboles, aperçu, export et partie', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto('/');
+  await openApp(page);
   await navigate(page, 'Atelier de tuiles');
   await page.getByRole('button', { name: 'Nouvelle tuile', exact: true }).click();
   await page.getByRole('textbox', { name: 'Nom de la tuile' }).fill('Ville expérimentale');

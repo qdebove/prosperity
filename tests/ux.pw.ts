@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { enterActions, openResearch, openNation } from './ui';
+import { enterActions, openApp, openResearch, openNation, reloadWithGame } from './ui';
 
 test('progression du tour, actions répétables et retour local', async ({ page }) => {
-  await page.goto('/');
+  await openApp(page);
   await expect(page.locator('.table-context')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Revenus :/ })).toHaveCount(0);
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
@@ -19,7 +19,7 @@ test('progression du tour, actions répétables et retour local', async ({ page 
 });
 
 test('prix et achat inspectables avant les actions, contexte effaçable sans mutation', async ({ page }) => {
-  await page.goto('/');
+  await openApp(page);
   const before = await page.evaluate(() => localStorage.getItem('prosperity.game.v1'));
   await page.getByTestId('slot-c1').click();
   await page.getByRole('button', { name: 'Rechercher un remplacement' }).click();
@@ -36,17 +36,17 @@ test('prix et achat inspectables avant les actions, contexte effaçable sans mut
 });
 
 test('2030 compte deux prospérités ; dépollution identique depuis le bouton', async ({ page }) => {
-  await page.goto('/');
-  await page.evaluate(() => {
+  await openApp(page);
+  const endgame = await page.evaluate(() => {
     const G = JSON.parse(localStorage.getItem('prosperity.game.v1')!);
     const cards = G.catalog.filter((t: { decade: number; tally: string }) => t.decade === 2030 && t.tally === 'prosperity');
     G.current = cards[0].id; G.turn = 31; G.phase = 'actions'; G.actions = 2; G.pollution = 15;
     G.deck = G.deck.filter((id: string) => id !== G.current).slice(-5);
     G.market = G.catalog.filter((t: { id: string }) => !G.deck.includes(t.id)).map((t: { id: string }) => t.id);
     G.log.push({ turn: 31, kind: 'event', revealedTileId: cards[0].id, text: 'Révélation publique' });
-    localStorage.setItem('prosperity.game.v1', JSON.stringify(G));
+    return G;
   });
-  await page.reload(); await enterActions(page);
+  await reloadWithGame(page, endgame); await enterActions(page);
   await expect(page.locator('.decade-tracker [aria-label="Prospérité : 1 passé, 1 restant"]')).toBeVisible();
   await expect(page.locator('.pollution-warning')).toContainText('Encore 1 pollution');
   await page.getByRole('button', { name: 'Dépolluer −1 disque', exact: true }).click();

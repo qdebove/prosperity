@@ -6,7 +6,6 @@ import { errorMessage } from './messages';
 import { readSession, saveSession } from './session';
 import { PROTOCOL_VERSION, type Lobby, type MultiplayerErrorCode, type Session } from './types';
 import NetworkGame from './NetworkGame';
-import './multiplayer.css';
 
 export async function lobbyRequest<T>(path: string, body?: object, session?: Session): Promise<T> {
   const response = await fetch(`${serverURL}/api/lobbies${path}`, { method: body ? 'POST' : 'GET',

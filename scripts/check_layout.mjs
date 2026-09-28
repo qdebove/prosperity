@@ -3,7 +3,7 @@ import { chromium } from '@playwright/test';
 const browser = await chromium.launch({ channel: 'chrome' });
 try {
   const page = await browser.newPage();
-  await page.goto('http://127.0.0.1:5173');
+  await page.goto('http://127.0.0.1:3000');
   for (const width of [320, 390, 768, 1024, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     await page.evaluate(() => window.scrollTo(0, 0));

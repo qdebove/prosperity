@@ -1,5 +1,5 @@
 import type { Ctx, Game } from 'boardgame.io';
-import { INVALID_MOVE } from 'boardgame.io/core';
+import { INVALID_MOVE } from 'boardgame.io/dist/cjs/core.js';
 import { BASE_CATALOG, LABELS, validateCatalog } from '../game/catalog';
 import { FINAL_STEPS, initialState, POLLUTION_LIMIT, previewState, resolveEnergy, resolveResearch, tally } from '../game/engine';
 import type { GameState, Symbol, Track } from '../game/types';

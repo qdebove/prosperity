@@ -1,30 +1,32 @@
 import { expect, test, type Page } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { BASE_CATALOG } from '../src/game/catalog';
+import { initialState, previewState } from '../src/game/engine';
 const LEVEL_STARTS = [0, 2, 5, 9, 14, 20], MAX_RESEARCH = 26;
 import type { GameState } from '../src/game/types';
-import { openNation, openResearch } from './ui';
+import { openApp, openNation, openResearch } from './ui';
 
 const out = '.artifacts/guide';
 mkdirSync(out, { recursive: true });
 async function fixture(page: Page, patch: Partial<GameState> = {}) {
-  await page.goto('/');
-  const G: GameState = await page.evaluate(async () => { const engine = await import('/src/game/engine.ts'); return engine.initialState(undefined, 'guide-2026'); });
+  await openApp(page);
+  const G: GameState = initialState(undefined, 'guide-2026');
   Object.assign(G, { turn: 1, phase: 'actions', actions: 2, lastMove: 'action', money: 400, score: 12, research: { energy: 4, ecology: 4 }, current: '1970-0' }, patch);
   if (!patch.deck) G.deck = G.deck.filter(id => id !== G.current);
   if (!patch.market) G.market.push(G.current!);
   G.totalTurns = G.turn + G.deck.length;
-  await page.goto('/');
+  await openApp(page);
   await page.evaluate(g => localStorage.setItem('prosperity.game.v1', JSON.stringify(g)), G);
   await page.reload();
   await expect(page.getByTestId('money-preview')).toHaveText(`${G.money} €`);
   return G;
 }
 async function state(page: Page) {
-  return page.evaluate(async () => { const engine = await import('/src/game/engine.ts'); return engine.previewState(JSON.parse(localStorage.getItem('prosperity.game.v1')!)); }) as Promise<GameState>;
+  const saved = await page.evaluate(() => localStorage.getItem('prosperity.game.v1'));
+  return previewState(JSON.parse(saved!)) as GameState;
 }
 async function capture(page: Page, id: string, description: string, fullPage = false) {
-  await page.locator('img').evaluateAll(imgs => Promise.all(imgs.map(img => { img.loading = 'eager'; return img.decode(); })));
+  await page.locator('img').evaluateAll(imgs => Promise.all(imgs.map(element => { const img = element as HTMLImageElement; img.loading = 'eager'; return img.decode(); })));
   await page.evaluate(() => document.fonts.ready);
   const scroll = await page.evaluate(() => scrollY);
   const referenceViewport = page.viewportSize()!;
@@ -226,7 +228,7 @@ test('guide : financement, seuils PP, accessibilité et responsive', async ({ pa
 
 test('guide : décompte, contexte, navigation et comparaison solo réelle', async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto('/');
+  await openApp(page);
   await page.getByRole('button', { name: 'Révéler la première tuile' }).click();
   const resolve = page.getByRole('button', { name: 'Valider', exact: true });
   if (await resolve.isVisible()) await resolve.click();

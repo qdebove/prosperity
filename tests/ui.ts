@@ -1,5 +1,16 @@
 import { expect, type Page } from '@playwright/test';
 
+export async function openApp(page: Page, path = '/') {
+  await page.goto(path);
+  await page.locator('.app-shell, .multiplayer-lobby, .network-table').first().waitFor();
+}
+
+export async function reloadWithGame(page: Page, game: unknown) {
+  await page.addInitScript(value => localStorage.setItem('prosperity.game.v1', JSON.stringify(value)), game);
+  await page.reload();
+  await page.locator('.app-shell').waitFor();
+}
+
 export async function navigate(page: Page, name: string) {
   const button = page.getByRole('button', { name, exact: true });
   if (!await button.isVisible()) await page.getByRole('button', { name: 'Menu de la partie', exact: true }).click();

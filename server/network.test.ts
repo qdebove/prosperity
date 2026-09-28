@@ -11,7 +11,7 @@ import { GAME_NAME, type AuthoritativeGameState, type CommandResult, type Lobby,
 import type { State } from 'boardgame.io';
 
 const audit: Record<string, unknown>[] = [];
-const server = createMultiplayerServer({ config: { host: '127.0.0.1', port: 0, origins: ['http://127.0.0.1:5173'], maxBodyBytes: 4 * 1024 * 1024 }, audit: event => audit.push(event) });
+const server = createMultiplayerServer({ config: { host: '127.0.0.1', port: 0, origins: ['http://127.0.0.1:3000'], maxBodyBytes: 4 * 1024 * 1024 }, audit: event => audit.push(event) });
 let url = '';
 const clients: ReturnType<typeof networkClient>[] = [];
 const sockets: Socket[] = [];
