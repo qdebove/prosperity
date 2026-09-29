@@ -1,15 +1,15 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { Server } from 'boardgame.io/server';
-import { createMatch } from 'boardgame.io/internal';
+import { Server } from 'boardgame.io/dist/cjs/server.js';
+import { createMatch } from 'boardgame.io/dist/cjs/internal.js';
 import type { Server as HTTPServer } from 'node:http';
-import { BASE_CATALOG, validateCatalog } from '../src/game/catalog';
-import { createMultiplayerGame } from '../src/multiplayer/game';
-import { PROTOCOL_VERSION, type Lobby, type MultiplayerErrorCode, type Session } from '../src/multiplayer/types';
-import { identifier, isRecord } from '../src/multiplayer/validation';
-import { serverConfig, type ServerConfig } from './config';
-import { GuestIdentityService, type IdentityService } from './identity';
-import { InMemoryMatchStore, type MatchStore } from './store';
-import { ProsperityTransport, type AuditLog } from './transport';
+import { BASE_CATALOG, validateCatalog } from '../src/game/catalog.js';
+import { createMultiplayerGame } from '../src/multiplayer/game.js';
+import { PROTOCOL_VERSION, type Lobby, type MultiplayerErrorCode, type Session } from '../src/multiplayer/types.js';
+import { identifier, isRecord } from '../src/multiplayer/validation.js';
+import { serverConfig, type ServerConfig } from './config.js';
+import { GuestIdentityService, type IdentityService } from './identity.js';
+import { InMemoryMatchStore, type MatchStore } from './store.js';
+import { ProsperityTransport, type AuditLog } from './transport.js';
 
 class RequestError extends Error { constructor(public code: MultiplayerErrorCode, public status = 400) { super(code); } }
 export function createMultiplayerServer(options: { config?: ServerConfig; store?: MatchStore; identity?: IdentityService; audit?: AuditLog } = {}) {

@@ -1,5 +1,5 @@
-import type { Category, Slot, Stats, Symbol, Tile, Track } from './types';
-import { artworkImageFor, normalizeArtworkImage, resolveArtwork } from '../artwork';
+import type { Category, Slot, Stats, Symbol, Tile, Track } from './types.js';
+import { artworkImageFor, normalizeArtworkImage, resolveArtwork } from '../artwork.js';
 
 export const LABELS: Record<Symbol, string> = { energy: 'Énergie', ecology: 'Écologie', capital: 'Capital', research: 'Recherche', prosperity: 'Prospérité' };
 export const CATEGORIES: Record<Category, string> = { power: 'Centrale', supply: 'Distribution', transport: 'Transport', infrastructure: 'Infrastructure', special: 'Projet spécial' };

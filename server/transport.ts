@@ -1,11 +1,11 @@
-import { SocketIO } from 'boardgame.io/server';
-import { Master } from 'boardgame.io/master';
-import { getFilterPlayerView } from 'boardgame.io/internal';
+import { SocketIO } from 'boardgame.io/dist/cjs/server.js';
+import { Master } from 'boardgame.io/dist/cjs/master.js';
+import { getFilterPlayerView } from 'boardgame.io/dist/cjs/internal.js';
 import type { Game, Server } from 'boardgame.io';
 import type { Server as IOServer, ServerOptions } from 'socket.io';
-import { validateCommit } from '../src/multiplayer/game';
-import { identifier, isRecord } from '../src/multiplayer/validation';
-import { PROTOCOL_VERSION, type AuthoritativeGameState, type CommandResult, type MultiplayerErrorCode } from '../src/multiplayer/types';
+import { validateCommit } from '../src/multiplayer/game.js';
+import { identifier, isRecord } from '../src/multiplayer/validation.js';
+import { PROTOCOL_VERSION, type AuthoritativeGameState, type CommandResult, type MultiplayerErrorCode } from '../src/multiplayer/types.js';
 
 type Update = Parameters<Master['onUpdate']>;
 type Outgoing = Parameters<Master['transportAPI']['sendAll']>[0];

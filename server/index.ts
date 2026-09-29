@@ -1,5 +1,5 @@
-import { createMultiplayerServer } from './app';
-import { serverConfig } from './config';
+import { createMultiplayerServer } from './app.js';
+import { serverConfig } from './config.js';
 
 const config = serverConfig();
 const app = createMultiplayerServer({ config });

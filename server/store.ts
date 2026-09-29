@@ -1,8 +1,8 @@
-import { Async } from 'boardgame.io/internal';
+import { Async } from 'boardgame.io/dist/cjs/internal.js';
 import type { LogEntry, Server, State, StorageAPI } from 'boardgame.io';
-import type { AuthoritativeGameState, Lobby } from '../src/multiplayer/types';
-import type { Tile } from '../src/game/types';
-import { publicGameState } from '../src/multiplayer/game';
+import type { AuthoritativeGameState, Lobby } from '../src/multiplayer/types.js';
+import type { Tile } from '../src/game/types.js';
+import { publicGameState } from '../src/multiplayer/game.js';
 
 export interface StoredLobby { lobby: Lobby; catalog: Tile[]; verifiers: Record<string, string>; revision: number }
 // Reuse the actual boardgame.io persistence port, plus the small lobby boundary.

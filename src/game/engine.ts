@@ -1,7 +1,7 @@
 import type { Game } from 'boardgame.io';
 import { INVALID_MOVE } from 'boardgame.io/dist/cjs/core.js';
-import { BASE_CATALOG, LABELS, SLOTS } from './catalog';
-import type { GameState, PlannedAction, Stats, Symbol, Tile, Track } from './types';
+import { BASE_CATALOG, LABELS, SLOTS } from './catalog.js';
+import type { GameState, PlannedAction, Stats, Symbol, Tile, Track } from './types.js';
 
 export const LEVEL_STARTS = [0, 2, 5, 9, 14, 20];
 export const MAX_RESEARCH = 26;

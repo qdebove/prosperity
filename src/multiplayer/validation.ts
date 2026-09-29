@@ -1,5 +1,5 @@
-import type { PlannedAction } from '../game/types';
-import type { CommitPreparedTurnCommand } from './types';
+import type { PlannedAction } from '../game/types.js';
+import type { CommitPreparedTurnCommand } from './types.js';
 
 export const isRecord = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
 export const identifier = (value: unknown): value is string => typeof value === 'string' && /^[a-zA-Z0-9_-]{1,80}$/.test(value);

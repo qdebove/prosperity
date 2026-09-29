@@ -1,10 +1,10 @@
 import type { Ctx, Game } from 'boardgame.io';
 import { INVALID_MOVE } from 'boardgame.io/dist/cjs/core.js';
-import { BASE_CATALOG, LABELS, validateCatalog } from '../game/catalog';
-import { FINAL_STEPS, initialState, POLLUTION_LIMIT, previewState, resolveEnergy, resolveResearch, tally } from '../game/engine';
-import type { GameState, Symbol, Track } from '../game/types';
-import { GAME_NAME, type AuthoritativeGameState, type CommitPreparedTurnCommand, type MatchSetup, type MultiplayerErrorCode, type PlayerGameState } from './types';
-import { isCommit } from './validation';
+import { BASE_CATALOG, LABELS, validateCatalog } from '../game/catalog.js';
+import { FINAL_STEPS, initialState, POLLUTION_LIMIT, previewState, resolveEnergy, resolveResearch, tally } from '../game/engine.js';
+import type { GameState, Symbol, Track } from '../game/types.js';
+import { GAME_NAME, type AuthoritativeGameState, type CommitPreparedTurnCommand, type MatchSetup, type MultiplayerErrorCode, type PlayerGameState } from './types.js';
+import { isCommit } from './validation.js';
 
 export function playerState(g: GameState): PlayerGameState {
   return { board: g.board, money: g.money, pollution: g.pollution, score: g.score, research: g.research, finalScores: g.finalScores };

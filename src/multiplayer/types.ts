@@ -1,4 +1,4 @@
-import type { GameState, PlannedAction, Symbol, Tile } from '../game/types';
+import type { GameState, PlannedAction, Symbol, Tile } from '../game/types.js';
 
 export const GAME_NAME = 'prosperity-network';
 export const PROTOCOL_VERSION = 1;
